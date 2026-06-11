@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130 44" role="img" aria-label="ShopeePay">
+  <path d="M14 14h12a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H14a4 4 0 0 1-4-4V18a4 4 0 0 1 4-4z" fill="#EE4D2D"/>
+  <path d="M16 14a4 4 0 0 1 8 0" fill="none" stroke="#EE4D2D" stroke-width="2.2"/>
+  <text x="34" y="29" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="17" font-weight="800" fill="#EE4D2D">ShopeePay</text>
+</svg>

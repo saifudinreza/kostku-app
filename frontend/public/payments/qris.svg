@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 44" role="img" aria-label="QRIS">
+  <rect x="10" y="12" width="8" height="8" fill="#1A1A2E"/>
+  <rect x="22" y="12" width="8" height="8" fill="#1A1A2E"/>
+  <rect x="10" y="24" width="8" height="8" fill="#1A1A2E"/>
+  <rect x="22" y="24" width="4" height="4" fill="#1A1A2E"/>
+  <text x="40" y="29" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="20" font-weight="800" fill="#E01F26">QR<tspan fill="#1A1A2E">IS</tspan></text>
+</svg>

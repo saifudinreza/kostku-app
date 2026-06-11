@@ -1,0 +1,315 @@
+@import "tailwindcss";
+
+/*
+  KostKu Design System — Tailwind v4
+  Tokens dari PRD §7.3 Color Palette, §7.4 Typography, §7.9 Tailwind Config.
+  Di Tailwind v4 konfigurasi tema ditulis di CSS lewat @theme (bukan tailwind.config.js).
+*/
+
+@theme {
+  /* Fonts — Plus Jakarta Sans is the KostKu display/UI face (Soft UI theme) */
+  --font-sans: var(--font-jakarta), var(--font-inter), ui-sans-serif, system-ui,
+    sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+
+  /* Brand / Primary — indigo-violet */
+  --color-brand: #6c5ce7;
+  --color-brand-light: #e7e3ff;
+  --color-brand-dark: #5a4bd4;
+
+  /* Sidebar — light neumorphic surface */
+  --color-sidebar: #e9eaf2;
+  --color-sidebar-text: #6b6e8a;
+  --color-sidebar-active: #2f3148;
+  --color-sidebar-border: #d7d9e8;
+
+  /* Surfaces — neumorphic base, cards share the base and lift via shadow */
+  --color-page: #e9eaf2;
+  --color-card: #e9eaf2;
+  --color-line: #d7d9e8;
+
+  /* Text */
+  --color-ink: #2f3148;
+  --color-ink-soft: #6b6e8a;
+
+  /* Semantic */
+  --color-success: #16a34a;
+  --color-warning: #d97706;
+  --color-danger: #dc2626;
+
+  /* Radius */
+  --radius-card: 20px;
+  --radius-badge: 999px;
+
+  /* Shadow — Soft UI dual shadow (raised) */
+  --shadow-card: 8px 8px 18px #c9cbdb, -8px -8px 18px #ffffff;
+  --shadow-card-hover: 12px 14px 28px #c2c4d6, -10px -10px 24px #ffffff;
+}
+
+:root {
+  --background: #e9eaf2;
+  --foreground: #2f3148;
+
+  /* Soft-UI button tokens — promoted to :root so kk-btn-* render correctly
+     outside .kk-landing (auth pages + owner/tenant app). Without these the
+     primary button has no background and shows white text on the base = invisible. */
+  --kk-base: #e9eaf2;
+  --kk-violet: #6c5ce7;
+  --kk-violet-light: #8b7bff;
+  --kk-grad: linear-gradient(135deg, #8b7bff, #6c5ce7);
+  --kk-lt: #ffffff;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Thin scrollbar untuk sidebar & panel chat */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
+}
+
+/* =========================================================================
+   KostKu Neumorphic Landing — Soft UI (Claude Design handoff)
+   Base #e9eaf2, warm indigo-violet accent. Scoped under .kk-landing so it
+   never bleeds into the owner/tenant app, which keeps the blue token set.
+   ========================================================================= */
+.kk-landing {
+  --kk-base: #e9eaf2;
+  --kk-ink: #2f3148;
+  --kk-ink-2: #353850;
+  --kk-ink-soft: #6b6e8a;
+  --kk-ink-mute: #797d99;
+  --kk-violet: #6c5ce7;
+  --kk-violet-light: #8b7bff;
+  --kk-grad: linear-gradient(135deg, #8b7bff, #6c5ce7);
+  /* neumorphic shadow pair */
+  --kk-dk: #c5c7d8;
+  --kk-lt: #ffffff;
+
+  background: var(--kk-base);
+  color: var(--kk-ink-2);
+  font-family: var(--font-jakarta), "Plus Jakarta Sans", system-ui, sans-serif;
+  overflow-x: hidden;
+}
+.kk-landing ::selection {
+  background: #d9d3ff;
+}
+
+/* ---- Soft UI surfaces -------------------------------------------------- */
+.nm-raised {
+  background: var(--kk-base);
+  box-shadow: 9px 9px 20px var(--kk-dk), -9px -9px 20px var(--kk-lt);
+}
+.nm-raised-lg {
+  background: var(--kk-base);
+  box-shadow: 16px 16px 36px #c4c6d6, -16px -16px 36px var(--kk-lt);
+}
+.nm-raised-sm {
+  background: var(--kk-base);
+  box-shadow: 5px 5px 12px #c8cada, -5px -5px 12px var(--kk-lt);
+}
+.nm-inset {
+  background: var(--kk-base);
+  box-shadow: inset 4px 4px 9px #cccede, inset -4px -4px 9px var(--kk-lt);
+}
+.nm-inset-lg {
+  background: var(--kk-base);
+  box-shadow: inset 9px 9px 22px #cccede, inset -9px -9px 22px var(--kk-lt);
+}
+
+/* ---- 3D button interactions ------------------------------------------- */
+.kk-btn {
+  transform: perspective(700px) translateZ(0);
+  transform-style: preserve-3d;
+  transition: transform 0.28s cubic-bezier(0.22, 0.8, 0.28, 1),
+    box-shadow 0.28s cubic-bezier(0.22, 0.8, 0.28, 1);
+  will-change: transform;
+}
+/* primary = gradient, lifts toward the viewer on hover */
+.kk-btn-primary {
+  background: var(--kk-grad);
+  color: #fff;
+  box-shadow: 7px 7px 18px #c0bee2, -7px -7px 18px var(--kk-lt);
+}
+.kk-btn-primary:hover {
+  transform: perspective(700px) translateY(-3px) translateZ(14px) rotateX(6deg);
+  box-shadow: 12px 16px 30px #b3b0de, -8px -8px 18px var(--kk-lt);
+}
+.kk-btn-primary:active {
+  transform: perspective(700px) translateY(0) translateZ(0) scale(0.97);
+  box-shadow: 4px 4px 10px #bcb9e2, -4px -4px 10px var(--kk-lt);
+}
+/* soft = neutral surface, presses inward on hover */
+.kk-btn-soft {
+  background: var(--kk-base);
+  color: #4a4d66;
+  box-shadow: 7px 7px 16px #cbcddd, -7px -7px 16px var(--kk-lt);
+}
+.kk-btn-soft:hover {
+  transform: perspective(700px) translateZ(-6px);
+  box-shadow: inset 5px 5px 11px #cbcddd, inset -5px -5px 11px var(--kk-lt);
+}
+.kk-btn-soft:active {
+  box-shadow: inset 6px 6px 13px #cbcddd, inset -6px -6px 13px var(--kk-lt);
+}
+/* white-on-violet CTA button */
+.kk-btn-light {
+  background: #fff;
+  color: var(--kk-violet);
+  box-shadow: 0 12px 28px rgba(60, 40, 140, 0.35);
+}
+.kk-btn-light:hover {
+  transform: perspective(700px) translateY(-3px) translateZ(12px);
+  box-shadow: 0 20px 38px rgba(60, 40, 140, 0.42);
+}
+
+/* ---- Card 3D hover lift ------------------------------------------------ */
+.kk-card {
+  transform: perspective(900px) translateZ(0);
+  transform-style: preserve-3d;
+  transition: transform 0.35s cubic-bezier(0.22, 0.8, 0.28, 1),
+    box-shadow 0.35s cubic-bezier(0.22, 0.8, 0.28, 1);
+  will-change: transform;
+}
+.kk-card:hover {
+  transform: perspective(900px) translateY(-7px) translateZ(20px) rotateX(3deg);
+  box-shadow: 16px 22px 38px #bcbed0, -12px -12px 28px var(--kk-lt);
+}
+
+/* ---- Scroll-reveal: smooth 3D entrance -------------------------------- */
+.kk-reveal {
+  opacity: 0;
+  transform: perspective(1200px) translateY(46px) rotateX(10deg);
+  transform-origin: 50% 100%;
+  transition: opacity 0.85s cubic-bezier(0.2, 0.7, 0.2, 1),
+    transform 0.85s cubic-bezier(0.2, 0.7, 0.2, 1);
+  will-change: opacity, transform;
+}
+.kk-reveal.is-visible {
+  opacity: 1;
+  transform: perspective(1200px) translateY(0) rotateX(0deg);
+}
+
+/* ---- Animations ------------------------------------------------------- */
+@keyframes kkFloaty {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-9px); }
+}
+@keyframes kkDotPulse {
+  0%, 60%, 100% { opacity: 0.25; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(-3px); }
+}
+@keyframes kkBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.kk-floaty { animation: kkFloaty 4.5s ease-in-out infinite; }
+
+.kk-scroll::-webkit-scrollbar { width: 6px; }
+.kk-scroll::-webkit-scrollbar-thumb { background: #cfd1e2; border-radius: 99px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .kk-reveal { opacity: 1; transform: none; transition: none; }
+  .kk-btn, .kk-card { transition: none; }
+  .kk-floaty { animation: none; }
+}
+
+/* =========================================================================
+   App (post-login) Soft-UI helpers — used by the shell + shared primitives
+   so dashboards share the same neumorphic language as the landing.
+   ========================================================================= */
+.nm-input {
+  background: #e9eaf2;
+  box-shadow: inset 4px 4px 9px #d0d2e2, inset -4px -4px 9px #ffffff;
+  border: 1px solid transparent;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.nm-input:focus,
+.nm-input:focus-within {
+  border-color: rgba(108, 92, 231, 0.45);
+  box-shadow: inset 4px 4px 9px #d0d2e2, inset -4px -4px 9px #ffffff,
+    0 0 0 3px rgba(108, 92, 231, 0.14);
+}
+/* small inset icon chip (violet glyph on base) */
+.nm-chip {
+  background: #e9eaf2;
+  box-shadow: inset 4px 4px 8px #cfd1e1, inset -4px -4px 8px #ffffff;
+}
+
+/* =========================================================================
+   Landing — animated "kost" background (twinkling windows + drifting clouds)
+   ========================================================================= */
+.kk-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+.kk-bg > * {
+  position: absolute;
+}
+/* soft colored glow blobs */
+.kk-blob {
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.5;
+}
+@keyframes kkDrift {
+  0% { transform: translate(0, 0); }
+  50% { transform: translate(40px, -26px); }
+  100% { transform: translate(0, 0); }
+}
+@keyframes kkDriftAlt {
+  0% { transform: translate(0, 0); }
+  50% { transform: translate(-36px, 22px); }
+  100% { transform: translate(0, 0); }
+}
+@keyframes kkCloud {
+  from { transform: translateX(-12%); }
+  to { transform: translateX(112%); }
+}
+@keyframes kkWindow {
+  0%, 100% { opacity: 0.18; }
+  50% { opacity: 0.9; }
+}
+@keyframes kkRise {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+.kk-window {
+  animation: kkWindow 3.2s ease-in-out infinite;
+}
+.kk-cloud {
+  animation: kkCloud linear infinite;
+}
+
+/* =========================================================================
+   Landing — gentle section snapping while scrolling (toggled per-route via
+   the html.kk-snap class so the dashboard scroll is never affected).
+   ========================================================================= */
+html.kk-snap {
+  scroll-snap-type: y proximity;
+  scroll-padding-top: 84px;
+}
+html.kk-snap [data-snap] {
+  scroll-snap-align: start;
+  scroll-margin-top: 84px;
+}
+@media (prefers-reduced-motion: reduce) {
+  html.kk-snap { scroll-snap-type: none; }
+  .kk-window, .kk-cloud, .kk-blob { animation: none; }
+}

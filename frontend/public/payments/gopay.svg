@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 44" role="img" aria-label="GoPay">
+  <circle cx="22" cy="22" r="13" fill="none" stroke="#00AED6" stroke-width="4"/>
+  <circle cx="22" cy="22" r="4.5" fill="#00AED6"/>
+  <text x="44" y="29" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="20" font-weight="800" fill="#0B0B0B">gopay</text>
+</svg>

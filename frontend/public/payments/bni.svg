@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 44" role="img" aria-label="BNI Virtual Account">
+  <text x="10" y="29" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="20" font-weight="800" fill="#F15A22">BNI</text>
+  <circle cx="62" cy="22" r="9" fill="#F15A22"/>
+  <text x="62" y="27" text-anchor="middle" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="11" font-weight="800" fill="#ffffff">46</text>
+  <text x="80" y="28" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="13" font-weight="700" fill="#6b6e8a">VA</text>
+</svg>
