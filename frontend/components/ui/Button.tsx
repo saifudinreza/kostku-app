@@ -1,8 +1,18 @@
+// =============================================================================
+// Button — tombol seragam untuk seluruh aplikasi.
+// ANALOGI: daripada menjahit baju (tombol) baru tiap kali butuh, kita punya
+// satu pola dengan beberapa "model" (variant) dan "ukuran" (size). Cukup pilih.
+// =============================================================================
 import { cn } from "@/lib/utils";
 
+// Variant = gaya/warna tombol. Size = ukuran. Menulisnya sebagai `type` dengan
+// pilihan terbatas membuat TypeScript menolak nilai salah ketik (mis. "primry").
 type Variant = "primary" | "outline" | "ghost" | "danger";
 type Size = "sm" | "md" | "lg";
 
+// "Kamus" yang memetakan tiap variant -> kumpulan class CSS-nya.
+// primary = tombol utama (gradien ungu), outline = netral, ghost = transparan,
+// danger = merah untuk aksi berbahaya (mis. hapus).
 const VARIANTS: Record<Variant, string> = {
   primary: "kk-btn kk-btn-primary",
   outline: "kk-btn kk-btn-soft",
@@ -17,11 +27,16 @@ const SIZES: Record<Size, string> = {
   lg: "h-12 px-6 text-base",
 };
 
+// Props tombol = atribut <button> biasa (onClick, disabled, type, ...) DITAMBAH
+// dua pilihan kita sendiri: variant & size. `extends` artinya "warisi semua
+// atribut tombol standar, lalu tambahkan punyaku".
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
   size?: Size;
 }
 
+// Kalau pemakai tidak menyebut variant/size, dipakai default: primary & md.
+// `...props` meneruskan sisa atribut (onClick, dll) ke <button> asli.
 export function Button({
   variant = "primary",
   size = "md",

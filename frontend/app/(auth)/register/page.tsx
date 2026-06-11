@@ -2,24 +2,37 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
 import type { UserRole } from "@/types";
 
 export default function RegisterPage() {
-  const router = useRouter();
+  const { register } = useAuth();
   const [role, setRole] = useState<UserRole>("owner");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (password !== passwordConfirmation) {
+      setError("Password tidak cocok.");
+      return;
+    }
     setLoading(true);
-    // Frontend-only: simulasi register. Produksi -> POST /api/register (Sanctum).
-    document.cookie = `auth_token=demo-token; path=/; max-age=86400`;
-    document.cookie = `user_role=${role}; path=/; max-age=86400`;
-    setTimeout(() => {
-      router.push(role === "owner" ? "/owner/dashboard" : "/tenant/dashboard");
-    }, 600);
+    setError(null);
+    try {
+      await register(name, email, password, passwordConfirmation, role);
+    } catch (err: unknown) {
+      const data = (err as { response?: { data?: { message?: string; errors?: Record<string, string[]> } } })?.response?.data;
+      const msg = data?.message ?? Object.values(data?.errors ?? {}).flat()[0] ?? "Pendaftaran gagal.";
+      setError(msg);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -56,6 +69,8 @@ export default function RegisterPage() {
           </label>
           <input
             required
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             className="nm-input h-11 w-full rounded-xl px-3.5 text-sm text-ink outline-none"
             placeholder="Nama kamu"
           />
@@ -65,21 +80,43 @@ export default function RegisterPage() {
           <input
             type="email"
             required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="nm-input h-11 w-full rounded-xl px-3.5 text-sm text-ink outline-none"
             placeholder="email@contoh.com"
           />
         </div>
         <div>
-          <label className="mb-1.5 block text-sm font-bold text-ink">
-            Password
-          </label>
+          <label className="mb-1.5 block text-sm font-bold text-ink">Password</label>
           <input
             type="password"
             required
+            minLength={8}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             className="nm-input h-11 w-full rounded-xl px-3.5 text-sm text-ink outline-none"
             placeholder="Minimal 8 karakter"
           />
         </div>
+        <div>
+          <label className="mb-1.5 block text-sm font-bold text-ink">
+            Ulangi password
+          </label>
+          <input
+            type="password"
+            required
+            value={passwordConfirmation}
+            onChange={(e) => setPasswordConfirmation(e.target.value)}
+            className="nm-input h-11 w-full rounded-xl px-3.5 text-sm text-ink outline-none"
+            placeholder="••••••••"
+          />
+        </div>
+
+        {error && (
+          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+            {error}
+          </p>
+        )}
 
         <button
           type="submit"
@@ -87,7 +124,7 @@ export default function RegisterPage() {
           className="kk-btn kk-btn-primary flex h-12 w-full items-center justify-center gap-2 rounded-xl text-sm font-bold disabled:opacity-60"
         >
           {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-          Daftar
+          Daftar sebagai {role === "owner" ? "Pemilik" : "Penghuni"}
         </button>
       </form>
 

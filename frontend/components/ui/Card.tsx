@@ -1,5 +1,13 @@
+// =============================================================================
+// Card — "kartu" panel ber-sudut-tumpul dengan bayangan, wadah utama konten.
+// ANALOGI: seperti map/folder di atas meja. Hampir semua bagian aplikasi
+// (tabel, statistik, form) diletakkan di dalam Card supaya tampak rapi & rata.
+// =============================================================================
 import { cn } from "@/lib/utils";
 
+// Card = kotak pembungkus. `...props` artinya semua atribut <div> biasa
+// (onClick, id, dll) diteruskan apa adanya. `cn(...)` menggabung style bawaan
+// dengan `className` tambahan dari pemakai, jadi tampilannya bisa disesuaikan.
 export function Card({
   className,
   ...props
@@ -12,6 +20,9 @@ export function Card({
   );
 }
 
+// CardHeader = bagian judul di atas sebuah Card (garis pemisah di bawahnya).
+// ANALOGI: seperti "kop surat" — judul di kiri, dan `action` (mis. tombol)
+// di kanan. `description` & `action` opsional (tanda `?`), tampil hanya bila ada.
 export function CardHeader({
   title,
   description,

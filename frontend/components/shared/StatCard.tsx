@@ -1,16 +1,23 @@
+// =============================================================================
+// StatCard — kartu angka ringkasan untuk dashboard.
+// ANALOGI: seperti "papan skor" kecil: ada label (mis. "Total Pendapatan"),
+// angka besarnya, ikon, dan delta (perubahan, mis. "+12%" naik = hijau).
+// =============================================================================
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface StatCardProps {
-  label: string;
-  value: string;
-  icon: LucideIcon;
-  /** mis. "+12%" atau "-15%" */
+  label: string; // keterangan, mis. "Kamar Terisi"
+  value: string; // angka utama yang ditonjolkan
+  icon: LucideIcon; // ikon dari pustaka lucide (dikirim sebagai komponen)
+  /** Perubahan dibanding periode lalu, mis. "+12%" atau "-15%" */
   delta?: string;
-  deltaTone?: "up" | "down" | "neutral";
+  deltaTone?: "up" | "down" | "neutral"; // warna delta: naik hijau / turun merah / netral abu
   iconClassName?: string;
 }
 
+// `icon: Icon` = ganti nama prop `icon` jadi `Icon` di dalam fungsi, karena
+// komponen React harus diawali huruf besar agar bisa ditulis sebagai <Icon />.
 export function StatCard({
   label,
   value,

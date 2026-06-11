@@ -1,9 +1,19 @@
-"use client";
+"use client"; // animasi mengetik berjalan di browser
 
 import { useEffect, useRef, useState } from "react";
 
+// =============================================================================
+// HeroChat — demo chat AI yang "hidup" di halaman depan (landing).
+// ANALOGI: seperti iklan di etalase yang memutar adegan berulang. Ini BUKAN
+// chat sungguhan — ia memutar naskah tetap (SCRIPT): pertanyaan muncul, lalu
+// jawaban "diketik" huruf demi huruf, lalu mengulang dari awal. Tujuannya
+// memamerkan fitur asisten AI ke calon pengguna.
+// =============================================================================
+
+// Bentuk satu pesan: dari "user" atau "ai".
 type Msg = { role: "user" | "ai"; text: string };
 
+// Naskah percakapan yang diputar berulang (tanya-jawab tetap).
 const SCRIPT = [
   {
     q: "Kenapa tagihan bulan ini lebih mahal?",
@@ -15,8 +25,11 @@ const SCRIPT = [
   },
 ];
 
+// sleep = "tunggu sekian milidetik" sebelum lanjut. Dipakai untuk memberi jeda
+// antar adegan supaya animasi terasa alami (seperti orang mengetik & berpikir).
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
+// Lingkaran kecil bertuliskan "AI" sebagai foto profil si asisten.
 function AiAvatar() {
   return (
     <div
@@ -31,46 +44,53 @@ function AiAvatar() {
   );
 }
 
-/** Live, looping typed AI-chat demo for the hero mockup. */
 export function HeroChat() {
-  const [msgs, setMsgs] = useState<Msg[]>([]);
-  const [typing, setTyping] = useState(false);
-  const [typingText, setTypingText] = useState("");
-  const bodyRef = useRef<HTMLDivElement | null>(null);
+  const [msgs, setMsgs] = useState<Msg[]>([]); // pesan yang sudah tampil
+  const [typing, setTyping] = useState(false); // sedang menampilkan AI mengetik?
+  const [typingText, setTypingText] = useState(""); // teks separuh jadi saat diketik
+  const bodyRef = useRef<HTMLDivElement | null>(null); // penanda kotak chat (untuk auto-scroll)
+  // aliveRef = "saklar nyala/mati". Saat komponen ditutup, kita set false agar
+  // perulangan animasi berhenti (tidak jalan di latar sia-sia / mencegah error).
   const aliveRef = useRef(true);
 
-  // keep the scroll pinned to the latest message
+  // Setiap ada pesan baru, geser otomatis ke bawah supaya pesan terbaru terlihat.
   useEffect(() => {
     const el = bodyRef.current;
     if (el) el.scrollTop = el.scrollHeight;
   }, [msgs, typing, typingText]);
 
+  // "Sutradara" animasi: menjalankan naskah berulang-ulang.
   useEffect(() => {
     aliveRef.current = true;
+    // Hormati pengaturan "kurangi animasi" di perangkat pengguna: kalau aktif,
+    // jawaban langsung muncul utuh tanpa efek mengetik.
     const reduce =
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     async function run() {
+      // Ulangi selamanya selama komponen masih "nyala".
       while (aliveRef.current) {
-        setMsgs([]);
+        setMsgs([]); // kosongkan layar, mulai dari awal
         setTyping(false);
         setTypingText("");
         await sleep(600);
 
+        // Mainkan tiap pasang tanya-jawab di naskah.
         for (const turn of SCRIPT) {
-          if (!aliveRef.current) return;
-          setMsgs((s) => [...s, { role: "user", text: turn.q }]);
+          if (!aliveRef.current) return; // berhenti bila komponen sudah ditutup
+          setMsgs((s) => [...s, { role: "user", text: turn.q }]); // tampilkan pertanyaan
           await sleep(680);
           if (!aliveRef.current) return;
 
-          setTyping(true);
+          setTyping(true); // mulai indikator "mengetik..."
           setTypingText("");
           await sleep(750);
 
           if (reduce) {
-            setTypingText(turn.a);
+            setTypingText(turn.a); // mode hemat animasi: langsung utuh
           } else {
+            // Efek ketik: tambah satu huruf tiap 16 ms.
             let buf = "";
             for (const ch of turn.a) {
               if (!aliveRef.current) return;

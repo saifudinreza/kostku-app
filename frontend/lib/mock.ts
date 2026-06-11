@@ -1,4 +1,17 @@
-// Data dummy untuk frontend-only. Nanti diganti TanStack Query ke Laravel API.
+// =============================================================================
+// Data dummy (mock) untuk tahap frontend-only.
+// -----------------------------------------------------------------------------
+// ANALOGI: ini "database boong-boongan" yang ditulis langsung di kode, supaya
+// tampilan bisa dikembangkan & dilihat dulu tanpa server/backend sungguhan.
+// Nanti semua isi file ini diganti panggilan ke Laravel API (lewat TanStack
+// Query). Halaman-halaman meng-`import` variabel di sini seolah-olah dari API.
+//
+// CARA DATA SALING TERHUBUNG (lewat angka "id" — seperti nomor KTP):
+//   User(owner) --owner_id--> Property --property_id--> Room
+//   Room <--room_id-- Tenancy --tenant_id--> User(tenant)
+//   Tenancy <--tenancy_id-- Invoice --invoice_id--> Payment & InvoiceItem
+// Jadi untuk tahu "tagihan ini punya siapa", kita telusuri rantai id tsb.
+// =============================================================================
 import type {
   Invoice,
   Message,
@@ -9,6 +22,9 @@ import type {
   User,
 } from "@/types";
 
+// "Pengguna yang sedang login" versi dummy. Login asli belum ada, jadi kita
+// anggap saja owner-nya Pak Hasan dan tenant-nya Budi. Dipakai untuk menyaring
+// data "milik saya" (mis. tagihan tenant cuma menampilkan milik currentTenant).
 export const currentOwner: User = {
   id: 1,
   name: "Pak Hasan",
@@ -27,6 +43,7 @@ export const currentTenant: User = {
   avatar: null,
 };
 
+// Daftar gedung kost milik owner. `owner_id: 1` = milik Pak Hasan (currentOwner).
 export const properties: Property[] = [
   {
     id: 1,
@@ -48,6 +65,8 @@ export const properties: Property[] = [
   },
 ];
 
+// Daftar kamar. `property_id` menempelkan kamar ke gedungnya:
+// id 101-203 -> Kost Melati (property 1), id 301 -> Kost Anggrek (property 2).
 export const rooms: Room[] = [
   { id: 101, property_id: 1, room_number: "101", floor: 1, price: 800000, status: "occupied", description: null },
   { id: 102, property_id: 1, room_number: "102", floor: 1, price: 800000, status: "available", description: null },
@@ -57,6 +76,10 @@ export const rooms: Room[] = [
   { id: 301, property_id: 2, room_number: "A1", floor: 1, price: 1100000, status: "occupied", description: null },
 ];
 
+// Daftar kontrak sewa = jembatan antara kamar dan penghuni.
+// Tiap entri: `room_id` (kamar mana) + `tenant_id` (penghuni siapa). Properti
+// `room` dan `tenant` di sini sengaja diisi objek lengkap supaya halaman tidak
+// perlu mencari manual — di API asli ini biasa disebut "eager loading"/relasi.
 export const tenancies: Tenancy[] = [
   {
     id: 1,
@@ -93,6 +116,9 @@ export const tenancies: Tenancy[] = [
   },
 ];
 
+// Daftar tagihan. `tenancy_id` menempelkan tagihan ke kontrak sewa tertentu,
+// jadi otomatis ketahuan kamar & penghuninya. `items` = rincian baris tagihan.
+// Status dibuat bervariasi (unpaid/paid/overdue) untuk menguji tampilan badge.
 export const invoices: Invoice[] = [
   {
     id: 1001,
@@ -151,6 +177,8 @@ export const invoices: Invoice[] = [
   },
 ];
 
+// Daftar pembayaran. `invoice_id` menautkan transaksi ke tagihannya.
+// Catatan: invoice 1000 & 1003 sudah "success" (lunas), 1001 masih "pending".
 export const payments: Payment[] = [
   {
     id: 1,
@@ -184,6 +212,9 @@ export const payments: Payment[] = [
   },
 ];
 
+// Riwayat chat owner <-> tenant. `sender_id`/`receiver_id` menunjuk siapa
+// kirim ke siapa (1 = Pak Hasan, 7 = Budi). Pesan ke-3 `is_read: false` =
+// belum dibaca, untuk menampilkan penanda pesan baru.
 export const messages: Message[] = [
   { id: 1, sender_id: 1, receiver_id: 7, tenancy_id: 1, body: "Halo Budi, tagihan Juni sudah terbit ya.", is_read: true, created_at: "2025-06-10T08:00:00", sender: currentOwner },
   { id: 2, sender_id: 7, receiver_id: 1, tenancy_id: 1, body: "Baik pak, nanti saya bayar sebelum jatuh tempo.", is_read: true, created_at: "2025-06-10T08:05:00", sender: currentTenant },

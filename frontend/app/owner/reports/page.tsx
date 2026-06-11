@@ -1,58 +1,63 @@
-import { DoorOpen, Sparkles, TrendingUp, Wallet } from "lucide-react";
+"use client";
+
+import { DoorOpen, Loader2, Sparkles, TrendingUp, Wallet } from "lucide-react";
 import { BarChart } from "@/components/shared/BarChart";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { StatCard } from "@/components/shared/StatCard";
 import { Card, CardHeader } from "@/components/ui/Card";
-import { monthlyRevenue, rooms } from "@/lib/mock";
+import { useOwnerStats, useMonthlyRevenue } from "@/lib/hooks/useDashboard";
 import { formatRupiah } from "@/lib/utils";
 
 export default function OwnerReportsPage() {
-  const occupied = rooms.filter((r) => r.status === "occupied").length;
-  const occupancy = Math.round((occupied / rooms.length) * 100);
+  const { data: stats, isLoading: loadingStats } = useOwnerStats();
+  const { data: monthlyRevenue = [], isLoading: loadingRevenue } = useMonthlyRevenue();
+
+  const loading = loadingStats || loadingRevenue;
+
+  if (loading) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-brand" />
+      </div>
+    );
+  }
+
   const totalRevenue = monthlyRevenue.reduce((s, m) => s + m.value, 0);
-  const avgRevenue = Math.round(totalRevenue / monthlyRevenue.length);
-  const last = monthlyRevenue[monthlyRevenue.length - 1].value;
-  const prev = monthlyRevenue[monthlyRevenue.length - 2].value;
-  const delta = Math.round(((last - prev) / prev) * 100);
+  const avgRevenue = monthlyRevenue.length > 0 ? Math.round(totalRevenue / monthlyRevenue.length) : 0;
+  const last = monthlyRevenue[monthlyRevenue.length - 1]?.value ?? 0;
+  const prev = monthlyRevenue[monthlyRevenue.length - 2]?.value ?? 0;
+  const delta = prev > 0 ? Math.round(((last - prev) / prev) * 100) : 0;
 
   return (
     <>
-      <PageHeader
-        title="Laporan"
-        description="Performa keuangan & hunian 6 bulan terakhir."
-      />
+      <PageHeader title="Laporan" description="Performa keuangan & hunian 6 bulan terakhir." />
 
       <div className="grid gap-4 sm:grid-cols-3">
         <StatCard
           label="Pendapatan Bulan Ini"
-          value={formatRupiah(last)}
+          value={formatRupiah(last || (stats?.monthly_revenue ?? 0))}
           icon={Wallet}
-          delta={`${delta > 0 ? "+" : ""}${delta}% vs bulan lalu`}
+          delta={monthlyRevenue.length > 1 ? `${delta > 0 ? "+" : ""}${delta}% vs bulan lalu` : undefined}
           deltaTone={delta >= 0 ? "up" : "down"}
         />
-        <StatCard
-          label="Rata-rata / Bulan"
-          value={formatRupiah(avgRevenue)}
-          icon={TrendingUp}
-        />
+        <StatCard label="Rata-rata / Bulan" value={formatRupiah(avgRevenue)} icon={TrendingUp} />
         <StatCard
           label="Occupancy Rate"
-          value={`${occupancy}%`}
+          value={`${stats?.occupancy_rate ?? 0}%`}
           icon={DoorOpen}
-          delta={`${occupied}/${rooms.length} kamar terisi`}
+          delta={`${stats?.occupied_rooms ?? 0}/${stats?.total_rooms ?? 0} kamar terisi`}
           deltaTone="neutral"
         />
       </div>
 
-      <Card>
-        <CardHeader
-          title="Pendapatan per Bulan"
-          description="Total tagihan terbayar tiap bulan."
-        />
-        <div className="p-5">
-          <BarChart data={monthlyRevenue} />
-        </div>
-      </Card>
+      {monthlyRevenue.length > 0 && (
+        <Card>
+          <CardHeader title="Pendapatan per Bulan" description="Total tagihan terbayar tiap bulan." />
+          <div className="p-5">
+            <BarChart data={monthlyRevenue} />
+          </div>
+        </Card>
+      )}
 
       <Card className="border-brand/20 bg-brand-light/50">
         <div className="flex items-start gap-3 p-5">
@@ -60,14 +65,12 @@ export default function OwnerReportsPage() {
             <Sparkles className="h-5 w-5" />
           </span>
           <div>
-            <h3 className="text-sm font-semibold text-ink">
-              AI Financial Insight
-            </h3>
+            <h3 className="text-sm font-semibold text-ink">AI Financial Insight</h3>
             <p className="mt-1 text-sm text-ink-soft">
-              Pendapatan Juni turun {Math.abs(delta)}% dibanding Mei karena 2
-              kamar kosong sejak tanggal 10 (Kamar 102 dan 201). Jika segera
-              diisi, proyeksi pendapatan Juli bisa kembali ke{" "}
-              {formatRupiah(4200000)}.
+              Tingkat hunian {stats?.occupancy_rate ?? 0}% ({stats?.occupied_rooms ?? 0}/{stats?.total_rooms ?? 0} kamar).
+              {stats && stats.overdue_invoices > 0
+                ? ` Terdapat ${stats.overdue_invoices} tagihan overdue — segera follow-up untuk menjaga arus kas.`
+                : " Semua tagihan terkini dalam kondisi baik."}
             </p>
           </div>
         </div>

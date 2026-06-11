@@ -1,9 +1,18 @@
-"use client";
+"use client"; // ada menu buka/tutup di HP -> komponen browser
 
 import { useState } from "react";
 import Link from "next/link";
 import { Building2, Menu, X } from "lucide-react";
 
+// =============================================================================
+// LandingNav — bilah menu atas halaman depan (sebelum login).
+// ANALOGI: seperti papan petunjuk di pintu masuk mall. `#fitur`, `#ai`, dst.
+// adalah "lompatan" ke bagian dalam halaman yang sama (anchor), bukan halaman
+// baru. Tombol "Masuk"/"Coba Gratis" mengarah ke halaman login/register.
+// =============================================================================
+
+// Daftar tautan menu. `href` diawali "#" = melompat ke bagian (section) yang
+// ber-id sama di halaman ini.
 const LINKS = [
   { label: "Fitur", href: "#fitur" },
   { label: "AI", href: "#ai" },
@@ -12,7 +21,7 @@ const LINKS = [
 ];
 
 export function LandingNav() {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false); // menu HP sedang terbuka?
 
   return (
     <header

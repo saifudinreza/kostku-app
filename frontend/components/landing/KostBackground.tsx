@@ -1,10 +1,13 @@
-/**
- * Animated, kost-themed backdrop for the hero. A soft neumorphic skyline of
- * boarding-house buildings whose windows gently twinkle, with drifting clouds
- * and glow blobs so the first screen never feels empty. Pure CSS animation
- * (keyframes in globals.css) — no JS, safe to render on the server.
- */
+// =============================================================================
+// KostBackground — hiasan latar halaman depan: deretan gedung kost yang
+// jendelanya berkelip, awan yang melayang, dan cahaya lembut.
+// ANALOGI: seperti lukisan kota di dinding belakang panggung. Murni hiasan
+// (`aria-hidden` = disembunyikan dari pembaca layar), tidak bisa diklik.
+// Semua gerakan dibuat lewat CSS (lihat globals.css), tanpa JavaScript.
+// =============================================================================
 
+// Bentuk data satu gedung: posisi-x, lebar, tinggi, jumlah kolom & baris
+// jendela, dan warnanya.
 type Building = {
   x: number;
   w: number;
@@ -14,7 +17,8 @@ type Building = {
   fill: string;
 };
 
-// A little kost row — varied heights/widths read as a cluster of boarding houses.
+// Daftar gedung dengan tinggi/lebar beragam supaya terlihat seperti gerombolan
+// rumah kost (skyline). Angka-angka ini koordinat di dalam kanvas SVG.
 const BUILDINGS: Building[] = [
   { x: 20, w: 120, h: 150, cols: 3, rows: 4, fill: "#cfd0e6" },
   { x: 150, w: 96, h: 210, cols: 2, rows: 6, fill: "#c3c4df" },
@@ -28,8 +32,10 @@ const BUILDINGS: Building[] = [
   { x: 1174, w: 110, h: 206, cols: 3, rows: 6, fill: "#c6c7e1" },
 ];
 
-const BASE_Y = 300; // ground line inside the 1300x320 viewBox
+const BASE_Y = 300; // garis tanah di dalam kanvas SVG 1300x320
 
+// Windows = menggambar petak-petak jendela pada satu gedung.
+// Sebagian jendela diberi class "kk-window" agar berkelip; sisanya redup tetap.
 function Windows({ b, bi }: { b: Building; bi: number }) {
   const pad = 14;
   const gapX = (b.w - pad * 2) / b.cols;

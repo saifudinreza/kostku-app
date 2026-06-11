@@ -1,5 +1,15 @@
+// =============================================================================
+// Komponen tabel: satu set "batu bata" untuk menyusun tabel yang seragam.
+// ANALOGI: Table = bingkai tabel, Th = judul kolom (baris paling atas yang
+// tebal), Tr = satu baris data, Td = satu sel/kotak di dalam baris.
+// Dipakai bersama tag HTML asli <thead>/<tbody>, contoh:
+//   <Table><thead><tr><Th>Nama</Th></tr></thead>
+//          <tbody><Tr><Td>Budi</Td></Tr></tbody></Table>
+// =============================================================================
 import { cn } from "@/lib/utils";
 
+// Table = pembungkus tabel. `overflow-x-auto` membuat tabel bisa digeser ke
+// samping di layar HP kalau kolomnya kebanyakan (tidak merusak tata letak).
 export function Table({ children }: { children: React.ReactNode }) {
   return (
     <div className="w-full overflow-x-auto">
@@ -8,6 +18,7 @@ export function Table({ children }: { children: React.ReactNode }) {
   );
 }
 
+// Th = "table header", judul kolom (huruf kecil-kapital, abu-abu, rata kiri).
 export function Th({
   children,
   className,
@@ -27,6 +38,7 @@ export function Th({
   );
 }
 
+// Td = "table data", satu sel isi di dalam baris.
 export function Td({
   children,
   className,
@@ -41,6 +53,8 @@ export function Td({
   );
 }
 
+// Tr = "table row", satu baris. Warnanya sedikit berubah saat disorot kursor
+// (`hover:bg-black/[0.03]`) supaya enak dibaca baris mana yang sedang ditunjuk.
 export function Tr({
   children,
   className,

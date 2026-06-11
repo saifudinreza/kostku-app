@@ -1,59 +1,49 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Send } from "lucide-react";
 import { cn, formatTanggal } from "@/lib/utils";
+import { useSendMessage } from "@/lib/hooks/useMessages";
 import type { Message } from "@/types";
 
-// Chat internal per kamar (PRD §4). Frontend-only: pesan baru disimpan di state.
-// Produksi: Laravel Broadcasting + Pusher untuk realtime.
 export function ChatThread({
   initialMessages,
   currentUserId,
+  tenancyId,
+  receiverId,
   placeholder = "Tulis pesan...",
   className,
 }: {
   initialMessages: Message[];
   currentUserId: number;
+  tenancyId: number;
+  receiverId: number;
   placeholder?: string;
   className?: string;
 }) {
-  const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [input, setInput] = useState("");
+  const sendMessage = useSendMessage();
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [initialMessages]);
 
   function send(e: React.FormEvent) {
     e.preventDefault();
     const body = input.trim();
-    if (!body) return;
-    const last = initialMessages[0];
-    setMessages((m) => [
-      ...m,
-      {
-        id: Date.now(),
-        sender_id: currentUserId,
-        receiver_id:
-          last?.sender_id === currentUserId
-            ? last.receiver_id
-            : last?.sender_id ?? 0,
-        tenancy_id: last?.tenancy_id ?? 0,
-        body,
-        is_read: false,
-        created_at: new Date().toISOString(),
-      },
-    ]);
+    if (!body || sendMessage.isPending) return;
+    sendMessage.mutate({ receiver_id: receiverId, tenancy_id: tenancyId, body });
     setInput("");
   }
 
   return (
     <div className={cn("flex h-full flex-col", className)}>
       <div className="scrollbar-thin flex-1 space-y-3 overflow-y-auto p-4">
-        {messages.map((m) => {
+        {initialMessages.map((m) => {
           const mine = m.sender_id === currentUserId;
           return (
-            <div
-              key={m.id}
-              className={cn("flex flex-col", mine ? "items-end" : "items-start")}
-            >
+            <div key={m.id} className={cn("flex flex-col", mine ? "items-end" : "items-start")}>
               <div
                 className={cn(
                   "max-w-[75%] rounded-2xl px-3.5 py-2 text-sm",
@@ -64,12 +54,11 @@ export function ChatThread({
               >
                 {m.body}
               </div>
-              <span className="mt-1 px-1 text-[11px] text-ink-soft">
-                {formatTanggal(m.created_at)}
-              </span>
+              <span className="mt-1 px-1 text-[11px] text-ink-soft">{formatTanggal(m.created_at)}</span>
             </div>
           );
         })}
+        <div ref={bottomRef} />
       </div>
 
       <form onSubmit={send} className="flex gap-2 border-t border-line/70 p-3">
@@ -81,7 +70,8 @@ export function ChatThread({
         />
         <button
           type="submit"
-          className="kk-btn kk-btn-primary flex h-11 w-11 items-center justify-center rounded-xl text-white"
+          disabled={sendMessage.isPending}
+          className="kk-btn kk-btn-primary flex h-11 w-11 items-center justify-center rounded-xl text-white disabled:opacity-60"
           aria-label="Kirim"
         >
           <Send className="h-4 w-4" />

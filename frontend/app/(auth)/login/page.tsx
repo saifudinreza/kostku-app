@@ -2,26 +2,41 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
 import type { UserRole } from "@/types";
 
 export default function LoginPage() {
-  const router = useRouter();
+  const { login } = useAuth();
   const [role, setRole] = useState<UserRole>("owner");
+  const [email, setEmail] = useState("owner@kostku.test");
+  const [password, setPassword] = useState("password");
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  function handleSubmit(e: React.FormEvent) {
+  // Switch role prefills demo credentials
+  function handleRoleSwitch(r: UserRole) {
+    setRole(r);
+    setEmail(r === "owner" ? "owner@kostku.test" : "tenant@kostku.test");
+    setPassword("password");
+    setError(null);
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    // Frontend-only: simulasi login. Produksi -> POST /api/login (Sanctum).
-    // Set cookie demo agar middleware mengizinkan akses dashboard.
-    document.cookie = `auth_token=demo-token; path=/; max-age=86400`;
-    document.cookie = `user_role=${role}; path=/; max-age=86400`;
-    setTimeout(() => {
-      router.push(role === "owner" ? "/owner/dashboard" : "/tenant/dashboard");
-    }, 600);
+    setError(null);
+    try {
+      await login(email, password);
+    } catch (err: unknown) {
+      const msg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message ?? "Login gagal. Periksa email dan password.";
+      setError(msg);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -33,13 +48,12 @@ export default function LoginPage() {
         Masuk untuk mengelola kost-mu.
       </p>
 
-      {/* Role toggle */}
       <div className="nm-input mt-6 grid grid-cols-2 gap-1 rounded-xl p-1.5">
         {(["owner", "tenant"] as UserRole[]).map((r) => (
           <button
             key={r}
             type="button"
-            onClick={() => setRole(r)}
+            onClick={() => handleRoleSwitch(r)}
             className={
               "h-9 rounded-lg text-sm font-bold capitalize transition-all " +
               (role === r
@@ -54,11 +68,14 @@ export default function LoginPage() {
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
         <div>
-          <label className="mb-1.5 block text-sm font-bold text-ink">Email</label>
+          <label className="mb-1.5 block text-sm font-bold text-ink">
+            Email
+          </label>
           <input
             type="email"
             required
-            defaultValue={role === "owner" ? "hasan@kostku.id" : "budi@kostku.id"}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="nm-input h-11 w-full rounded-xl px-3.5 text-sm text-ink outline-none"
             placeholder="email@contoh.com"
           />
@@ -75,7 +92,8 @@ export default function LoginPage() {
             <input
               type={showPw ? "text" : "password"}
               required
-              defaultValue="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="nm-input h-11 w-full rounded-xl px-3.5 pr-10 text-sm text-ink outline-none"
               placeholder="••••••••"
             />
@@ -89,6 +107,12 @@ export default function LoginPage() {
             </button>
           </div>
         </div>
+
+        {error && (
+          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+            {error}
+          </p>
+        )}
 
         <button
           type="submit"

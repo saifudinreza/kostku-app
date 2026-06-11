@@ -26,6 +26,19 @@ import { Reveal } from "@/components/landing/Reveal";
 import { KostBackground } from "@/components/landing/KostBackground";
 import { LandingScrollEffects } from "@/components/landing/LandingScrollEffects";
 
+// =============================================================================
+// LandingPage — halaman depan (etalase) yang dilihat pengunjung di "/".
+// ANALOGI: seperti brosur/billboard produk. Tujuannya meyakinkan calon
+// pengguna lalu mengarahkan ke tombol "Daftar"/"Masuk".
+//
+// POLA PENTING: semua TEKS isi halaman dikumpulkan di "data array" di atas
+// (FEATURES, PROBLEMS, dst). Lalu di bawah, JSX tinggal `.map(...)` —
+// mengulang satu cetakan tampilan untuk tiap data. ANALOGI: bikin satu stempel
+// kartu, lalu cap berulang untuk tiap isi. Mau tambah fitur? cukup tambah satu
+// objek di array, tampilannya ikut bertambah otomatis.
+// =============================================================================
+
+// Daftar fitur utama (ikon + judul + deskripsi) untuk bagian "Fitur Utama".
 const FEATURES = [
   {
     icon: LayoutDashboard,
@@ -59,6 +72,7 @@ const FEATURES = [
   },
 ];
 
+// Dua "persona" beserta keluhannya, untuk bagian "Masalahnya" (owner & tenant).
 const PROBLEMS = [
   {
     icon: Briefcase,
@@ -84,6 +98,7 @@ const PROBLEMS = [
   },
 ];
 
+// Tiga fitur ber-AI yang ditonjolkan (bagian "Ditenagai AI").
 const AI_FEATURES = [
   {
     icon: MessageCircleHeart,
@@ -105,6 +120,7 @@ const AI_FEATURES = [
   },
 ];
 
+// Empat langkah alur pemakaian (bagian "Cara Kerja").
 const STEPS = [
   {
     title: "Daftar & Tambah Properti",
@@ -124,6 +140,7 @@ const STEPS = [
   },
 ];
 
+// Kutipan testimoni pengguna (bagian "Testimoni"). `initial` = huruf avatar.
 const TESTIMONIALS = [
   {
     initial: "H",
@@ -148,14 +165,18 @@ const TESTIMONIALS = [
   },
 ];
 
+// Angka statistik mini di kartu mockup hero (`accent` = ditampilkan warna ungu).
 const HERO_STATS = [
   { label: "Total Kamar", value: "20", accent: false },
   { label: "Terisi", value: "18", accent: true },
   { label: "Pendapatan", value: "4,2", suffix: "jt", accent: false },
 ];
 
+// Tiga poin kepercayaan di bawah tombol utama (mis. "Gratis untuk mulai").
 const HERO_TRUST = ["Gratis untuk mulai", "Tanpa kartu kredit", "Setup 5 menit"];
 
+// Pill = "lencana" kapsul kecil (mis. label "Fitur Utama"). Komponen mungil
+// yang dipakai berulang di tiap judul bagian, supaya tidak menyalin style sama.
 function Pill({ children }: { children: React.ReactNode }) {
   return (
     <div className="mb-5 inline-flex items-center gap-[9px] rounded-full px-4 py-2 nm-inset">
@@ -164,9 +185,13 @@ function Pill({ children }: { children: React.ReactNode }) {
   );
 }
 
+// Susunan halaman dari atas ke bawah: Nav -> Hero -> Masalah -> Fitur -> AI ->
+// Cara Kerja -> Testimoni -> Ajakan (CTA) -> Footer. `kk-landing` membatasi
+// tema neumorphic agar tidak bocor ke halaman dashboard.
 export default function LandingPage() {
   return (
     <div className="kk-landing min-h-screen">
+      {/* mengaktifkan efek scroll-snap khusus landing (lihat komponennya) */}
       <LandingScrollEffects />
       <LandingNav />
 
@@ -570,7 +595,7 @@ export default function LandingPage() {
               <span className="text-lg font-extrabold text-[#353850]">KostKu</span>
             </div>
             <p className="m-0 max-w-[260px] text-[13.5px] leading-[1.6] text-[#8c8fab]">
-              Platform manajemen kost ber-AI untuk pemilik dan penghuni di
+              Platform manajemen kost terkonfigurasi AI untuk memudahkan pemilik dan penghuni kost di
               Indonesia.
             </p>
           </div>
@@ -609,9 +634,6 @@ export default function LandingPage() {
         <div className="mx-auto flex max-w-[1180px] flex-wrap items-center justify-between gap-3 border-t border-[#dadce8] px-6 pb-10 pt-[22px]">
           <span className="text-[13px] font-medium text-[#9a9db5]">
             © 2026 KostKu. Dibuat di Indonesia.
-          </span>
-          <span className="font-mono text-[12.5px] font-medium text-[#9a9db5]">
-            Next.js 16 · Laravel 11 · Groq AI
           </span>
         </div>
       </footer>

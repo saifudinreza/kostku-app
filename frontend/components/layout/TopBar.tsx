@@ -1,8 +1,14 @@
-"use client";
+"use client"; // ada tombol (menu, notifikasi) -> komponen browser
 
-import { Bell, Menu, Search } from "lucide-react";
+import { Bell, LogOut, Menu, Search } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
 import type { User } from "@/types";
 
+// =============================================================================
+// TopBar — bilah atas: tombol menu (HP), kolom cari, lonceng, & profil.
+// ANALOGI: seperti "dashboard mobil" yang selalu di depan mata: pintasan
+// penting tanpa harus pindah halaman. Menempel di atas saat halaman digulir.
+// =============================================================================
 export function TopBar({
   user,
   onMenuClick,
@@ -10,6 +16,10 @@ export function TopBar({
   user: User;
   onMenuClick: () => void;
 }) {
+  const { logout } = useAuth();
+  // Buat inisial dari nama untuk avatar. Contoh: "Budi Santoso" -> "BS".
+  // Caranya: pecah per kata -> ambil 2 kata pertama -> ambil huruf awal tiap
+  // kata -> gabung -> jadikan huruf besar.
   const initials = user.name
     .split(" ")
     .slice(0, 2)
@@ -43,6 +53,7 @@ export function TopBar({
           aria-label="Notifikasi"
         >
           <Bell className="h-5 w-5" />
+          {/* Titik merah kecil = penanda ada notifikasi baru (masih statis). */}
           <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-danger ring-2 ring-[#e9eaf2]" />
         </button>
 
@@ -60,6 +71,15 @@ export function TopBar({
             {initials}
           </span>
         </div>
+
+        <button
+          onClick={() => logout()}
+          className="nm-chip flex h-10 w-10 items-center justify-center rounded-xl text-ink-soft transition-colors hover:text-danger"
+          aria-label="Keluar"
+          title="Keluar"
+        >
+          <LogOut className="h-4.5 w-4.5" />
+        </button>
       </div>
     </header>
   );

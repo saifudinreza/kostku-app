@@ -1,12 +1,19 @@
+// =============================================================================
+// BarChart — grafik batang sederhana, dibuat dari div biasa (tanpa pustaka).
+// ANALOGI: bayangkan deretan gelas diisi air. Gelas tertinggi = nilai terbesar,
+// gelas lain diisi proporsional terhadap yang tertinggi. Saat disorot, muncul
+// gelembung berisi nominal rupiahnya.
+// Untuk produksi bisa diganti pustaka grafik (mis. Recharts).
+// =============================================================================
 import { formatRupiah } from "@/lib/utils";
 
-// Bar chart sederhana tanpa dependency (CSS bars).
-// Untuk produksi bisa diganti Recharts sesuai PRD §6.2.
 export function BarChart({
   data,
 }: {
-  data: { month: string; value: number }[];
+  data: { month: string; value: number }[]; // mis. [{month:"Jan", value:3800000}, ...]
 }) {
+  // Cari nilai terbesar -> jadi patokan tinggi 100%. Angka `1` di akhir mencegah
+  // pembagian dengan nol kalau datanya kosong (biar tidak error).
   const max = Math.max(...data.map((d) => d.value), 1);
 
   return (
@@ -14,6 +21,8 @@ export function BarChart({
       {data.map((d) => (
         <div key={d.month} className="flex flex-1 flex-col items-center gap-2">
           <div className="flex w-full flex-1 items-end">
+            {/* Tinggi batang = (nilai ÷ nilai terbesar) × 100%. Jadi batang
+                tertinggi penuh, yang lain mengikuti proporsinya. */}
             <div
               className="group relative w-full rounded-t-md bg-brand/80 transition-all hover:bg-brand"
               style={{ height: `${(d.value / max) * 100}%` }}

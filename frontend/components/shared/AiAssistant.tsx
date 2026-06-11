@@ -1,22 +1,36 @@
+// "use client" = WAJIB di atas. Memberi tahu Next.js bahwa komponen ini jalan
+// di browser (punya tombol, ketikan, state yang berubah). Tanpa ini, fitur
+// interaktif seperti useState/onClick tidak bisa dipakai.
 "use client";
 
 import { useState } from "react";
 import { Bot, Send, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+// =============================================================================
+// AiAssistant — kotak chat "Asisten Tagihan AI".
+// ANALOGI: seperti customer service yang menjawab pertanyaan soal tagihan.
+// SEKARANG masih boong-boongan: jawabannya tetap (MOCK_REPLIES) dan ada jeda
+// 0,9 detik untuk meniru "AI sedang berpikir". Nanti diganti panggilan API
+// ke model AI sungguhan (mis. LLM via Groq) lewat endpoint backend.
+// =============================================================================
+
+// Satu giliran percakapan: dari "user" (pengguna) atau "ai" (asisten).
 interface ChatTurn {
   role: "user" | "ai";
   text: string;
 }
 
-// Smart Invoice Assistant (PRD §5.1). Frontend-only: jawaban di-mock.
-// Produksi: POST /api/ai/invoice-chat -> Groq LLaMA 3.3 70B.
+// Jawaban tetap untuk simulasi. Kunci "default" dipakai untuk semua pertanyaan.
 const MOCK_REPLIES: Record<string, string> = {
   default:
     "Tagihan Juni 2025 kamu Rp 950.000, jatuh tempo 20 Juni 2025 dan belum dibayar. Terdiri dari Sewa Kamar Rp 800.000 + Listrik Rp 150.000.",
 };
 
 export function AiAssistant() {
+  // useState = "ingatan" komponen. Saat isinya diubah, tampilan otomatis
+  // digambar ulang. `turns` = riwayat percakapan (mulai dengan sapaan AI).
+  // `input` = teks yang sedang diketik. `loading` = sedang menunggu jawaban?
   const [turns, setTurns] = useState<ChatTurn[]>([
     {
       role: "ai",
@@ -26,14 +40,18 @@ export function AiAssistant() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Dijalankan saat pengguna menekan tombol kirim / Enter.
   function send(e: React.FormEvent) {
-    e.preventDefault();
-    const q = input.trim();
-    if (!q || loading) return;
+    e.preventDefault(); // cegah halaman reload (perilaku bawaan form HTML)
+    const q = input.trim(); // buang spasi di ujung
+    if (!q || loading) return; // abaikan kalau kosong atau masih menunggu jawaban
+    // Tambah pesan pengguna ke riwayat. `[...t, baru]` = salin semua yang lama
+    // lalu tempel yang baru di akhir (bikin daftar baru, tidak mengubah aslinya).
     setTurns((t) => [...t, { role: "user", text: q }]);
-    setInput("");
-    setLoading(true);
-    // Simulasi panggilan API Groq
+    setInput(""); // kosongkan kolom ketik
+    setLoading(true); // tampilkan animasi "sedang mengetik"
+    // Tiru jeda jaringan: setelah 0,9 detik, munculkan jawaban AI.
+    // Nanti `setTimeout` ini diganti `fetch`/`await` ke API AI sungguhan.
     setTimeout(() => {
       setTurns((t) => [...t, { role: "ai", text: MOCK_REPLIES.default }]);
       setLoading(false);
@@ -51,10 +69,12 @@ export function AiAssistant() {
         </span>
         <div>
           <h3 className="text-sm font-semibold text-ink">Asisten Tagihan AI</h3>
-          <p className="text-xs text-ink-soft">LLaMA 3.3 70B via Groq</p>
         </div>
       </div>
 
+      {/* Area gulung berisi gelembung chat. `turns.map(...)` = gambar satu
+          gelembung untuk tiap pesan. Pesan user dirata-kanan & berwarna ungu,
+          pesan AI dirata-kiri & polos (lihat `cn(...)` di bawah). */}
       <div className="scrollbar-thin flex-1 space-y-3 overflow-y-auto p-4">
         {turns.map((t, i) => (
           <div

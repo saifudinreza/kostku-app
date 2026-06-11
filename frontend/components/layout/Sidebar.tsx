@@ -1,4 +1,4 @@
-"use client";
+"use client"; // memakai usePathname & onClick -> komponen browser
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -6,21 +6,29 @@ import { Building2, LogOut, X } from "lucide-react";
 import type { NavItem } from "./nav-config";
 import { cn } from "@/lib/utils";
 
+// =============================================================================
+// Sidebar — menu samping kiri. ANALOGI: seperti daftar menu di sisi restoran.
+// Di desktop selalu tampil; di HP muncul sebagai "laci" (drawer) yang bisa
+// dibuka/ditutup. Menu yang sedang dibuka disorot ungu otomatis.
+// =============================================================================
 interface SidebarProps {
-  items: NavItem[];
+  items: NavItem[]; // daftar menu (dari nav-config)
   /** Sub-label di bawah logo, mis. "Owner" / "Penghuni" */
   roleLabel: string;
-  /** Status open di mobile (drawer) */
+  /** Status terbuka di mode HP (drawer) */
   open: boolean;
-  onClose: () => void;
+  onClose: () => void; // fungsi untuk menutup drawer
 }
 
 export function Sidebar({ items, roleLabel, open, onClose }: SidebarProps) {
+  // usePathname = alamat URL halaman saat ini (mis. "/owner/invoices").
+  // Dipakai untuk menentukan menu mana yang sedang aktif (disorot).
   const pathname = usePathname();
 
   return (
     <>
-      {/* Overlay mobile */}
+      {/* Lapisan gelap di belakang drawer saat dibuka di HP. Menekannya =
+          menutup sidebar (`onClose`). `lg:hidden` = hanya muncul di layar kecil. */}
       {open && (
         <div
           className="fixed inset-0 z-30 bg-black/40 lg:hidden"
@@ -63,11 +71,14 @@ export function Sidebar({ items, roleLabel, open, onClose }: SidebarProps) {
         </div>
 
         {/* Nav */}
+        {/* Daftar menu: ubah tiap item jadi sebuah link (Link). */}
         <nav className="scrollbar-thin flex-1 space-y-1.5 overflow-y-auto px-3 py-4">
           {items.map((item) => {
+            // Menu dianggap "aktif" bila URL sekarang sama persis ATAU berada di
+            // dalam menu itu (mis. /owner/invoices/1001 tetap menyorot "Tagihan").
             const active =
               pathname === item.href || pathname.startsWith(item.href + "/");
-            const Icon = item.icon;
+            const Icon = item.icon; // huruf besar agar bisa ditulis <Icon />.
             return (
               <Link
                 key={item.href}

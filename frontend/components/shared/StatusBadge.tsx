@@ -1,6 +1,14 @@
+// =============================================================================
+// StatusBadge — "stiker status" berwarna (mis. Lunas hijau, Telat merah).
+// ANALOGI: seperti stempel di berkas. Kita kirim kode status dalam bahasa
+// program ("paid"), komponen menerjemahkannya jadi teks Indonesia + warna yang
+// pas, supaya pengguna langsung paham hanya dari warnanya.
+// =============================================================================
 import { cn } from "@/lib/utils";
 
-// Sistem badge status — PRD §7.5
+// "Kamus" status: tiap kode -> { label tampil, warna }. Hijau = beres/aman,
+// kuning = perlu perhatian, merah = bermasalah, biru = sedang diproses, abu =
+// netral/selesai. Satu tempat ini dipakai untuk invoice, kamar, sewa, & bayar.
 const STYLES: Record<string, { label: string; className: string }> = {
   // Invoice
   paid: { label: "Lunas", className: "text-[#15803D] bg-[#DCFCE7]" },
@@ -26,6 +34,9 @@ export function StatusBadge({
   status: string;
   className?: string;
 }) {
+  // Ambil gaya sesuai status. `?? {...}` = pengaman: kalau statusnya tidak
+  // dikenal di kamus, tampilkan teks apa adanya dengan warna abu netral
+  // (daripada error/blank).
   const conf = STYLES[status] ?? {
     label: status,
     className: "text-ink-soft bg-slate-100",

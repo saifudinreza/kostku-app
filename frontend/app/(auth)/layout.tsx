@@ -1,6 +1,16 @@
 import Link from "next/link";
 import { Building2, CreditCard, Sparkles } from "lucide-react";
 
+// =============================================================================
+// AuthLayout — bingkai khusus halaman login & register (folder "(auth)").
+// ANALOGI: layar terbagi dua. Kiri = panel promosi ungu (cuma tampil di layar
+// lebar), kanan = kartu form. Login & register berbagi bingkai ini, jadi panel
+// kiri tidak perlu ditulis dua kali — `children` diganti sesuai halamannya.
+// Catatan: nama folder "(auth)" dalam tanda kurung = hanya pengelompokan,
+// tidak ikut jadi bagian URL (alamatnya tetap /login, bukan /auth/login).
+// =============================================================================
+
+// Tiga keunggulan yang dipajang di panel kiri.
 const PERKS = [
   { icon: Building2, label: "Manajemen properti & kamar terpusat" },
   { icon: CreditCard, label: "Pembayaran online VA, GoPay, OVO, QRIS" },
@@ -8,7 +18,7 @@ const PERKS = [
 ];
 
 export default function AuthLayout({
-  children,
+  children, // halaman login atau register yang sedang dibuka
 }: {
   children: React.ReactNode;
 }) {
