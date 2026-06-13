@@ -15,10 +15,20 @@ export function usePayments() {
 export function useCreateSnapToken() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (invoiceId: number) => {
-      const { data } = await api.post<{ snap_token: string; order_id: string }>(
-        `/invoices/${invoiceId}/pay`
-      );
+    mutationFn: async ({
+      invoiceId,
+      enabledPayments,
+    }: {
+      invoiceId: number;
+      enabledPayments?: string[]; // kode Midtrans dari metode yang dipilih user
+    }) => {
+      const { data } = await api.post<{
+        snap_token: string;
+        client_key: string;
+        order_id: string;
+      }>(`/invoices/${invoiceId}/pay`, {
+        ...(enabledPayments?.length ? { enabled_payments: enabledPayments } : {}),
+      });
       return data;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["invoices"] }),

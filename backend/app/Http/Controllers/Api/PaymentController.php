@@ -80,17 +80,26 @@ class PaymentController extends Controller
             ? 'https://app.midtrans.com/snap/v1/transactions'
             : 'https://app.sandbox.midtrans.com/snap/v1/transactions';
 
-        $response = Http::withBasicAuth($serverKey, '')
-            ->post($baseUrl, [
-                'transaction_details' => [
-                    'order_id'     => $orderId,
-                    'gross_amount' => $invoice->total_amount,
-                ],
-                'customer_details' => [
-                    'first_name' => $invoice->tenancy->tenant->name ?? '',
-                    'email'      => $invoice->tenancy->tenant->email ?? '',
-                ],
-            ]);
+        // enabled_payments = array kode channel dari frontend (mis. ["gopay"]).
+        // Kalau tidak dikirim, Midtrans tampilkan semua metode yang aktif.
+        $enabledPayments = $request->input('enabled_payments');
+
+        $payload = [
+            'transaction_details' => [
+                'order_id'     => $orderId,
+                'gross_amount' => $invoice->total_amount,
+            ],
+            'customer_details' => [
+                'first_name' => $invoice->tenancy->tenant->name ?? '',
+                'email'      => $invoice->tenancy->tenant->email ?? '',
+            ],
+        ];
+
+        if (!empty($enabledPayments) && is_array($enabledPayments)) {
+            $payload['enabled_payments'] = $enabledPayments;
+        }
+
+        $response = Http::withBasicAuth($serverKey, '')->post($baseUrl, $payload);
 
         if ($response->failed()) {
             return response()->json(['message' => 'Gagal membuat snap token.', 'error' => $response->body()], 502);

@@ -16,23 +16,31 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Create owner
-        $owner = User::create([
-            'name'              => 'Pak Hasan',
-            'email'             => 'owner@kostku.test',
-            'password'          => Hash::make('password'),
-            'role'              => 'owner',
-            'email_verified_at' => now(),
-        ]);
+        // firstOrCreate = buat baru kalau belum ada, pakai yang lama kalau sudah ada
+        $owner = User::firstOrCreate(
+            ['email' => 'owner@kostku.test'],
+            [
+                'name'              => 'Pak Hasan',
+                'password'          => Hash::make('password'),
+                'role'              => 'owner',
+                'email_verified_at' => now(),
+            ]
+        );
 
-        // Create tenant
-        $tenant = User::create([
-            'name'              => 'Budi Santoso',
-            'email'             => 'tenant@kostku.test',
-            'password'          => Hash::make('password'),
-            'role'              => 'tenant',
-            'email_verified_at' => now(),
-        ]);
+        $tenant = User::firstOrCreate(
+            ['email' => 'tenant@kostku.test'],
+            [
+                'name'              => 'Budi Santoso',
+                'password'          => Hash::make('password'),
+                'role'              => 'tenant',
+                'email_verified_at' => now(),
+            ]
+        );
+
+        // Kalau properti sudah ada (dari seed sebelumnya), skip sisanya
+        if ($owner->properties()->exists()) {
+            return;
+        }
 
         // Create property
         $property = Property::create([

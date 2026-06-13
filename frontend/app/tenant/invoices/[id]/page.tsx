@@ -11,6 +11,7 @@ import { PaymentMethods } from "@/components/shared/PaymentMethods";
 import { useInvoice } from "@/lib/hooks/useInvoices";
 import { useCreateSnapToken } from "@/lib/hooks/usePayments";
 import { formatPeriode, formatRupiah, formatTanggal } from "@/lib/utils";
+import type { PaymentMethod } from "@/lib/payments";
 
 export default function TenantInvoiceDetail({
   params,
@@ -20,6 +21,8 @@ export default function TenantInvoiceDetail({
   const { id } = use(params);
   const { data: invoice, isLoading } = useInvoice(Number(id));
   const createSnapToken = useCreateSnapToken();
+
+  const [selectedMethod, setSelectedMethod] = useState<PaymentMethod | null>(null);
   const [snapError, setSnapError] = useState<string | null>(null);
 
   if (isLoading) {
@@ -35,21 +38,29 @@ export default function TenantInvoiceDetail({
   async function handlePay() {
     if (!invoice) return;
     setSnapError(null);
+
     try {
-      const result = await createSnapToken.mutateAsync(invoice.id);
+      const result = await createSnapToken.mutateAsync({
+        invoiceId: invoice.id,
+        // Kirim kode Midtrans metode yang dipilih → Snap hanya tampilkan channel itu
+        enabledPayments: selectedMethod ? [selectedMethod.midtransCode] : undefined,
+      });
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const snapObj = typeof window !== "undefined" ? (window as any).snap : null;
       if (snapObj) {
         snapObj.pay(result.snap_token, {
           onSuccess: () => window.location.reload(),
           onPending: () => window.location.reload(),
-          onError: () => setSnapError("Pembayaran gagal. Coba lagi."),
+          onError:   () => setSnapError("Pembayaran gagal. Coba lagi."),
+          onClose:   () => {},
         });
       } else {
-        setSnapError(`Snap token: ${result.snap_token} (Midtrans belum di-load)`);
+        // Midtrans belum terkonfigurasi — tampilkan token untuk debug
+        setSnapError(`Snap JS belum di-load. Token: ${result.snap_token}`);
       }
     } catch {
-      setSnapError("Gagal membuat token pembayaran.");
+      setSnapError("Gagal membuat token pembayaran. Coba lagi.");
     }
   }
 
@@ -69,6 +80,7 @@ export default function TenantInvoiceDetail({
       />
 
       <div className="grid gap-6 lg:grid-cols-3">
+        {/* Rincian tagihan */}
         <Card className="lg:col-span-2">
           <CardHeader title="Rincian Tagihan" action={<StatusBadge status={invoice.status} />} />
           <div className="divide-y divide-line">
@@ -88,6 +100,7 @@ export default function TenantInvoiceDetail({
           </div>
         </Card>
 
+        {/* Panel pembayaran */}
         <Card className="h-fit">
           <CardHeader title="Pembayaran" />
           <div className="space-y-4 p-5">
@@ -103,25 +116,37 @@ export default function TenantInvoiceDetail({
             ) : (
               <>
                 <div>
-                  <p className="mb-3 text-xs font-medium text-ink-soft">Pilih metode pembayaran</p>
-                  <PaymentMethods />
+                  <p className="mb-3 text-xs font-medium text-ink-soft">
+                    Pilih metode pembayaran
+                  </p>
+                  {/* onSelect → simpan ke state, dikirim ke Midtrans saat Bayar */}
+                  <PaymentMethods onSelect={setSelectedMethod} />
                 </div>
+
                 {snapError && (
-                  <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{snapError}</p>
+                  <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+                    {snapError}
+                  </p>
                 )}
+
                 <Button
                   className="w-full"
                   size="lg"
                   onClick={handlePay}
-                  disabled={createSnapToken.isPending}
+                  disabled={createSnapToken.isPending || !selectedMethod}
                 >
                   {createSnapToken.isPending ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : selectedMethod ? (
+                    `Bayar via ${selectedMethod.label}`
                   ) : (
-                    `Bayar ${formatRupiah(invoice.total_amount)}`
+                    "Pilih metode pembayaran dulu"
                   )}
                 </Button>
-                <p className="text-center text-[11px] text-ink-soft">Pembayaran aman via Midtrans Snap.</p>
+
+                <p className="text-center text-[11px] text-ink-soft">
+                  Pembayaran aman via Midtrans Snap.
+                </p>
               </>
             )}
           </div>
