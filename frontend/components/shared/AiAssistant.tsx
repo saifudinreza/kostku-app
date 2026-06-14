@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Bot, Send, Sparkles, Zap } from "lucide-react";
+import { Bot, Send, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth-context";
 import { useInvoiceChat, useFinancialInsight } from "@/lib/hooks/useAi";
@@ -81,14 +81,21 @@ export function AiAssistant() {
         <div className="flex-1">
           <h3 className="text-sm font-semibold text-ink">Asisten AI</h3>
           <p className="text-[10px] text-ink-soft">
-            Groq · OpenRouter fallback
+            Powered by AI · Siap membantu
           </p>
         </div>
-        {/* Indikator online */}
-        <span className="flex items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 text-[10px] font-semibold text-green-600">
-          <Zap className="h-2.5 w-2.5" />
-          Online
-        </span>
+        {/* Indikator status — berubah saat AI sedang memproses */}
+        {isPending ? (
+          <span className="flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-0.5 text-[10px] font-semibold text-amber-600">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-500" />
+            Memproses...
+          </span>
+        ) : (
+          <span className="flex items-center gap-1.5 rounded-full bg-green-50 px-2.5 py-0.5 text-[10px] font-semibold text-green-600">
+            <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
+            Aktif
+          </span>
+        )}
       </div>
 
       {/* Area chat */}
@@ -123,10 +130,10 @@ export function AiAssistant() {
               <Bot className="h-4 w-4" />
             </span>
             <div className="rounded-2xl rounded-bl-sm px-3 py-2.5 [box-shadow:inset_3px_3px_7px_#d0d2e2,inset_-3px_-3px_7px_#ffffff]">
-              <span className="flex gap-1">
-                <i className="h-1.5 w-1.5 animate-bounce rounded-full bg-ink-soft [animation-delay:-0.3s]" />
-                <i className="h-1.5 w-1.5 animate-bounce rounded-full bg-ink-soft [animation-delay:-0.15s]" />
-                <i className="h-1.5 w-1.5 animate-bounce rounded-full bg-ink-soft" />
+              <span className="flex gap-1" aria-label="AI sedang mengetik" role="status">
+                <span aria-hidden="true" className="h-1.5 w-1.5 animate-bounce rounded-full bg-ink-soft [animation-delay:-0.3s]" />
+                <span aria-hidden="true" className="h-1.5 w-1.5 animate-bounce rounded-full bg-ink-soft [animation-delay:-0.15s]" />
+                <span aria-hidden="true" className="h-1.5 w-1.5 animate-bounce rounded-full bg-ink-soft" />
               </span>
             </div>
           </div>
@@ -137,7 +144,11 @@ export function AiAssistant() {
 
       {/* Input */}
       <form onSubmit={send} className="flex gap-2 border-t border-line/70 p-3">
+        <label htmlFor="ai-chat-input" className="sr-only">
+          {role === "owner" ? "Tanya tentang keuangan kost" : "Tanya tentang tagihan kamu"}
+        </label>
         <input
+          id="ai-chat-input"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder={

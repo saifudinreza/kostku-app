@@ -198,7 +198,7 @@ export default function LandingPage() {
       {/* ============ HERO ============ */}
       <section
         data-snap
-        className="relative isolate overflow-hidden pb-[72px] pt-16"
+        className="relative isolate overflow-hidden pb-[72px] pt-20"
       >
         <KostBackground />
         <div className="relative z-10 mx-auto grid max-w-[1180px] items-center gap-14 px-6 lg:grid-cols-[1.05fr_1fr]">
@@ -212,12 +212,18 @@ export default function LandingPage() {
               Kini dengan Asisten AI
             </span>
           </Pill>
-          <h1 className="m-0 mb-[22px] text-[clamp(40px,6vw,54px)] font-extrabold leading-[1.05] tracking-[-1.5px] text-[#2f3148] text-balance">
+          <h1
+            className="m-0 mb-[22px] text-[clamp(40px,6vw,54px)] font-extrabold leading-[1.05] tracking-[-1.5px] text-[#2f3148] text-balance"
+            style={{ textShadow: "0 1px 22px rgba(233,234,242,0.95)" }}
+          >
             Atur kost-mu
             <br />
             tanpa drama.
           </h1>
-          <p className="m-0 mb-[34px] max-w-[480px] text-lg leading-[1.65] text-[#6b6e8a] text-pretty">
+          <p
+            className="m-0 mb-[34px] max-w-[480px] text-lg leading-[1.65] text-[#5b5e7a] text-pretty"
+            style={{ textShadow: "0 1px 16px rgba(233,234,242,0.9)" }}
+          >
             Satu dashboard untuk pemilik & penghuni — kelola kamar, tagihan, dan
             pembayaran online. Lengkap dengan asisten AI yang siap menjawab soal
             tagihan kapan saja.

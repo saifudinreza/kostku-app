@@ -16,6 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
         // Tidak pakai SPA cookie auth — frontend pakai Bearer token (disimpan di localStorage).
         // EnsureFrontendRequestsAreStateful dihapus agar tidak mewajibkan CSRF cookie.
 
+        // HandleCors diprepend agar OPTIONS preflight (mis. multipart/form-data upload)
+        // langsung dijawab dengan CORS headers sebelum menyentuh auth:sanctum.
+        $middleware->prepend(\Illuminate\Http\Middleware\HandleCors::class);
+
         $middleware->alias([
             'abilities'  => \Laravel\Sanctum\Http\Middleware\CheckAbilities::class,
             'ability'    => \Laravel\Sanctum\Http\Middleware\CheckForAnyAbility::class,

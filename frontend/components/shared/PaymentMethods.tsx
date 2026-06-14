@@ -36,7 +36,8 @@ export function PaymentMethods({ onSelect }: PaymentMethodsProps) {
             <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink-soft">
               {group.label}
             </p>
-            <div className="grid grid-cols-2 gap-2.5">
+            {/* grid-cols-1 di <320px agar tidak terlalu sempit, 2 kolom di atasnya */}
+            <div className="grid grid-cols-1 gap-2.5 min-[320px]:grid-cols-2">
               {methods.map((m) => {
                 const active = selected === m.id;
                 return (
@@ -46,7 +47,7 @@ export function PaymentMethods({ onSelect }: PaymentMethodsProps) {
                     onClick={() => pick(m)}
                     aria-pressed={active}
                     className={cn(
-                      "relative flex h-14 items-center justify-center rounded-xl border bg-white px-3 transition-all",
+                      "relative flex h-14 w-full items-center justify-center rounded-xl border bg-white px-3 transition-all",
                       active
                         ? "border-brand ring-2 ring-brand/30"
                         : "border-line hover:border-brand/50"
@@ -56,7 +57,7 @@ export function PaymentMethods({ onSelect }: PaymentMethodsProps) {
                     <img
                       src={m.logo}
                       alt={m.label}
-                      className="h-7 w-auto object-contain"
+                      className="h-7 w-auto max-w-full object-contain"
                     />
                     {active && (
                       <span className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-brand text-white">

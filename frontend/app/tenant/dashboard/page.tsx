@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { ArrowRight, BedDouble, CalendarClock, Loader2, Wallet } from "lucide-react";
-import { AiAssistant } from "@/components/shared/AiAssistant";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Button } from "@/components/ui/Button";
@@ -32,8 +31,8 @@ export default function TenantDashboard() {
     <>
       <PageHeader title={`Halo, ${firstName}!`} description="Ringkasan kamar dan tagihanmu." />
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="space-y-6 lg:col-span-2">
+      <div className="grid gap-6 lg:grid-cols-2">
+        <div className="space-y-6">
           <Card className="p-5">
             {room ? (
               <>
@@ -106,10 +105,6 @@ export default function TenantDashboard() {
               </div>
             </Card>
           )}
-        </div>
-
-        <div className="h-[28rem] lg:h-auto">
-          <AiAssistant />
         </div>
       </div>
     </>

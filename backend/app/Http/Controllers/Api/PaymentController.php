@@ -115,6 +115,63 @@ class PaymentController extends Controller
         ]);
     }
 
+    /**
+     * Query Midtrans langsung untuk status terbaru, lalu sync ke DB lokal.
+     * Solusi untuk development di localhost di mana webhook Midtrans tidak bisa masuk.
+     */
+    public function checkStatus(Invoice $invoice): JsonResponse
+    {
+        $payment = $invoice->payment;
+
+        if (!$payment || !$payment->midtrans_order_id) {
+            return response()->json(['message' => 'Belum ada transaksi untuk tagihan ini.'], 404);
+        }
+
+        $serverKey    = env('MIDTRANS_SERVER_KEY', '');
+        $isProduction = env('MIDTRANS_IS_PRODUCTION', false);
+        $baseUrl      = $isProduction
+            ? 'https://api.midtrans.com/v2'
+            : 'https://api.sandbox.midtrans.com/v2';
+
+        $response = Http::withBasicAuth($serverKey, '')
+            ->get("{$baseUrl}/{$payment->midtrans_order_id}/status");
+
+        if ($response->failed()) {
+            Log::warning('Midtrans status check failed', [
+                'order_id' => $payment->midtrans_order_id,
+                'response' => $response->body(),
+            ]);
+            return response()->json(['message' => 'Gagal cek status dari Midtrans.'], 502);
+        }
+
+        $data              = $response->json();
+        $transactionStatus = $data['transaction_status'] ?? null;
+        $fraudStatus       = $data['fraud_status']       ?? 'accept';
+        $paymentType       = $data['payment_type']       ?? null;
+
+        if (in_array($transactionStatus, ['capture', 'settlement'])
+            && ($transactionStatus !== 'capture' || $fraudStatus === 'accept')) {
+            $payment->update(['status' => 'success', 'paid_at' => now(), 'payment_method' => $paymentType]);
+            $invoice->update(['status' => 'paid']);
+        } elseif (in_array($transactionStatus, ['cancel', 'deny', 'expire'])) {
+            $payment->update(['status' => 'failed']);
+            $invoice->update(['status' => 'unpaid']);
+        } elseif ($transactionStatus === 'pending') {
+            $payment->update(['status' => 'pending']);
+        }
+
+        Log::info('Midtrans status check', [
+            'order_id'           => $payment->midtrans_order_id,
+            'transaction_status' => $transactionStatus,
+        ]);
+
+        return response()->json([
+            'transaction_status' => $transactionStatus,
+            'payment_status'     => $payment->fresh()->status,
+            'invoice_status'     => $invoice->fresh()->status,
+        ]);
+    }
+
     public function webhook(Request $request): JsonResponse
     {
         $serverKey  = env('MIDTRANS_SERVER_KEY', '');

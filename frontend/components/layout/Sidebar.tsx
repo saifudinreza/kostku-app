@@ -1,10 +1,11 @@
-"use client"; // memakai usePathname & onClick -> komponen browser
+"use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Building2, LogOut, X } from "lucide-react";
 import type { NavItem } from "./nav-config";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/lib/auth-context";
 
 // =============================================================================
 // Sidebar — menu samping kiri. ANALOGI: seperti daftar menu di sisi restoran.
@@ -24,6 +25,7 @@ export function Sidebar({ items, roleLabel, open, onClose }: SidebarProps) {
   // usePathname = alamat URL halaman saat ini (mis. "/owner/invoices").
   // Dipakai untuk menentukan menu mana yang sedang aktif (disorot).
   const pathname = usePathname();
+  const { logout } = useAuth();
 
   return (
     <>
@@ -98,15 +100,15 @@ export function Sidebar({ items, roleLabel, open, onClose }: SidebarProps) {
           })}
         </nav>
 
-        {/* Logout */}
+        {/* Logout — panggil fungsi logout dari auth context agar token dihapus */}
         <div className="p-3">
-          <Link
-            href="/login"
-            className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-sidebar-text transition-all hover:text-danger hover:[box-shadow:inset_3px_3px_7px_#d3d5e4,inset_-3px_-3px_7px_#ffffff]"
+          <button
+            onClick={() => logout()}
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-sidebar-text transition-all hover:text-danger hover:[box-shadow:inset_3px_3px_7px_#d3d5e4,inset_-3px_-3px_7px_#ffffff]"
           >
             <LogOut className="h-5 w-5" />
             Keluar
-          </Link>
+          </button>
         </div>
       </aside>
     </>

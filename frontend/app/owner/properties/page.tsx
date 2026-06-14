@@ -1,37 +1,58 @@
 "use client";
 
 import { useState } from "react";
-import { Building2, Loader2, MapPin, Pencil, Plus, Trash2 } from "lucide-react";
+import { Building2, CheckCircle2, ImageOff, Loader2, MapPin, Pencil, Plus, Trash2 } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { AddPropertyModal } from "@/components/shared/AddPropertyModal";
 import { RoomModal } from "@/components/shared/RoomModal";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { useProperties } from "@/lib/hooks/useProperties";
+import { useProperties, useDeleteProperty } from "@/lib/hooks/useProperties";
 import { useAllRooms, useDeleteRoom } from "@/lib/hooks/useRooms";
 import { formatRupiah } from "@/lib/utils";
-import type { Room } from "@/types";
+import type { Property, Room } from "@/types";
 
 export default function PropertiesPage() {
   const { data: properties = [], isLoading: loadingProps } = useProperties();
   const { data: rooms = [],      isLoading: loadingRooms } = useAllRooms();
-  const deleteRoom = useDeleteRoom();
+  const deleteRoom     = useDeleteRoom();
+  const deleteProperty = useDeleteProperty();
 
-  // State modal properti
-  const [propModalOpen, setPropModalOpen] = useState(false);
+  // State modal properti — null = tutup, Property = edit mode, true = tambah baru
+  const [propModal, setPropModal] = useState<null | true | Property>(null);
 
   // State modal kamar — null = tutup, number = tambah (prefill properti), Room = edit
   const [roomModal, setRoomModal] = useState<null | { defaultPropertyId?: number; room?: Room }>(null);
 
-  // State konfirmasi hapus — simpan id kamar yang sedang dikonfirmasi
+  // State konfirmasi hapus kamar
   const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
+  // State konfirmasi hapus properti
+  const [confirmDeletePropId, setConfirmDeletePropId] = useState<number | null>(null);
+
+  // Toast notifikasi
+  const [toast, setToast] = useState<{ type: "success" | "error"; msg: string } | null>(null);
 
   const loading = loadingProps || loadingRooms;
 
-  async function handleDelete(id: number) {
-    await deleteRoom.mutateAsync(id);
-    setConfirmDeleteId(null);
+  async function handleDeleteRoom(id: number) {
+    try {
+      await deleteRoom.mutateAsync(id);
+      setConfirmDeleteId(null);
+      setToast({ type: "success", msg: "Kamar berhasil dihapus." });
+    } catch {
+      setToast({ type: "error", msg: "Gagal menghapus kamar." });
+    }
+  }
+
+  async function handleDeleteProperty(id: number) {
+    try {
+      await deleteProperty.mutateAsync(id);
+      setConfirmDeletePropId(null);
+      setToast({ type: "success", msg: "Properti berhasil dihapus." });
+    } catch {
+      setToast({ type: "error", msg: "Gagal menghapus properti. Pastikan semua kamar sudah dihapus terlebih dahulu." });
+    }
   }
 
   if (loading) {
@@ -44,16 +65,19 @@ export default function PropertiesPage() {
 
   return (
     <>
-      {/* Modal tambah properti */}
+      {/* Modal tambah / edit properti */}
       <AddPropertyModal
-        open={propModalOpen}
-        onClose={() => setPropModalOpen(false)}
+        open={propModal !== null}
+        onClose={() => setPropModal(null)}
+        onSuccess={() => setToast({ type: "success", msg: propModal === true ? "Properti berhasil ditambahkan." : "Properti berhasil diperbarui." })}
+        property={propModal !== null && propModal !== true ? propModal : undefined}
       />
 
       {/* Modal tambah / edit kamar */}
       <RoomModal
         open={roomModal !== null}
         onClose={() => setRoomModal(null)}
+        onSuccess={() => setToast({ type: "success", msg: "Kamar berhasil disimpan." })}
         properties={properties}
         room={roomModal?.room}
         defaultPropertyId={roomModal?.defaultPropertyId}
@@ -63,12 +87,20 @@ export default function PropertiesPage() {
         title="Properti"
         description="Kelola semua kost milikmu."
         action={
-          <Button onClick={() => setPropModalOpen(true)}>
+          <Button onClick={() => setPropModal(true)}>
             <Plus className="h-4 w-4" />
             Tambah Properti
           </Button>
         }
       />
+
+      {toast && (
+        <div className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium ${toast.type === "success" ? "bg-green-50 text-green-700" : "bg-red-50 text-red-600"}`}>
+          {toast.type === "success" && <CheckCircle2 className="h-5 w-5 shrink-0" />}
+          <span className="flex-1">{toast.msg}</span>
+          <button onClick={() => setToast(null)} className="opacity-60 hover:opacity-100">✕</button>
+        </div>
+      )}
 
       {/* Kartu per properti */}
       <div className="grid gap-6 md:grid-cols-2">
@@ -79,15 +111,71 @@ export default function PropertiesPage() {
 
           return (
             <Card key={p.id} className="overflow-hidden">
-              <div className="flex h-32 items-center justify-center bg-gradient-to-br from-brand to-brand-dark">
-                <Building2 className="h-12 w-12 text-white/80" />
-              </div>
+              {(() => {
+                const primaryPhoto = propRooms
+                  .flatMap((r) => r.images ?? [])
+                  .find((img) => img.is_primary);
+                const firstPhoto = propRooms
+                  .flatMap((r) => r.images ?? [])
+                  .at(0);
+                const photo = primaryPhoto ?? firstPhoto;
+                const apiBase = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api").replace("/api", "");
+                return photo ? (
+                  <div className="relative h-36 overflow-hidden">
+                    <img
+                      src={`${apiBase}/storage/${photo.image_path}`}
+                      alt={p.name}
+                      className="h-full w-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+                  </div>
+                ) : (
+                  <div className="flex h-36 items-center justify-center bg-gradient-to-br from-brand to-brand-dark">
+                    <Building2 className="h-12 w-12 text-white/80" />
+                  </div>
+                );
+              })()}
               <div className="p-5">
-                <div className="flex items-start justify-between">
+                <div className="flex items-start justify-between gap-2">
                   <h3 className="text-lg font-semibold text-ink">{p.name}</h3>
-                  <span className="rounded-badge bg-brand-light px-2.5 py-0.5 text-xs font-medium text-brand">
-                    {p.rooms_count ?? propRooms.length} kamar
-                  </span>
+                  <div className="flex shrink-0 items-center gap-1">
+                    <span className="rounded-badge bg-brand-light px-2.5 py-0.5 text-xs font-medium text-brand">
+                      {p.rooms_count ?? propRooms.length} kamar
+                    </span>
+                    <button
+                      onClick={() => setPropModal(p)}
+                      className="rounded-lg p-1.5 text-ink-soft hover:bg-line hover:text-ink"
+                      title="Edit properti"
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                    </button>
+                    {confirmDeletePropId === p.id ? (
+                      <span className="flex items-center gap-1">
+                        <button
+                          onClick={() => handleDeleteProperty(p.id)}
+                          disabled={deleteProperty.isPending}
+                          className="rounded-lg bg-red-500 px-2 py-1 text-xs font-semibold text-white hover:bg-red-600 disabled:opacity-60"
+                        >
+                          {deleteProperty.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : "Ya"}
+                        </button>
+                        <button
+                          onClick={() => setConfirmDeletePropId(null)}
+                          className="rounded-lg border border-line px-2 py-1 text-xs font-semibold text-ink-soft hover:text-ink"
+                        >
+                          Batal
+                        </button>
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => setConfirmDeletePropId(p.id)}
+                        disabled={occupied > 0}
+                        className="rounded-lg p-1.5 text-ink-soft hover:bg-line hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-40"
+                        title={occupied > 0 ? "Tidak bisa hapus properti yang masih ada penghuninya" : "Hapus properti"}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    )}
+                  </div>
                 </div>
                 <p className="mt-1 flex items-center gap-1.5 text-sm text-ink-soft">
                   <MapPin className="h-4 w-4" />
@@ -149,6 +237,25 @@ export default function PropertiesPage() {
                   key={r.id}
                   className="flex flex-col gap-3 rounded-lg border border-line p-4"
                 >
+                  {/* Foto kamar (thumbnail) */}
+                  {(() => {
+                    const primaryImg = (r.images ?? []).find((img) => img.is_primary) ?? (r.images ?? [])[0];
+                    const apiBase = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api").replace("/api", "");
+                    return primaryImg ? (
+                      <div className="aspect-video overflow-hidden rounded-lg">
+                        <img
+                          src={`${apiBase}/storage/${primaryImg.image_path}`}
+                          alt={`Kamar ${r.room_number}`}
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex aspect-video items-center justify-center rounded-lg bg-line">
+                        <ImageOff className="h-6 w-6 text-ink-soft/40" />
+                      </div>
+                    );
+                  })()}
+
                   {/* Info kamar */}
                   <div className="flex items-start justify-between">
                     <div>
@@ -171,7 +278,7 @@ export default function PropertiesPage() {
                         Hapus kamar ini?
                       </span>
                       <button
-                        onClick={() => handleDelete(r.id)}
+                        onClick={() => handleDeleteRoom(r.id)}
                         disabled={deleteRoom.isPending}
                         className="rounded-lg bg-red-500 px-3 py-1 text-xs font-semibold text-white hover:bg-red-600 disabled:opacity-60"
                       >

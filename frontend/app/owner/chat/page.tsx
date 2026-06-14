@@ -33,6 +33,7 @@ export default function OwnerChatPage() {
       <PageHeader title="Chat" description="Pesan internal dengan penghuni." />
 
       <Card className="grid h-[calc(100vh-13rem)] grid-cols-1 overflow-hidden md:grid-cols-[18rem_1fr]">
+        {/* Sidebar daftar penghuni — hanya muncul di desktop */}
         <div className="hidden border-r border-line md:block">
           <div className="border-b border-line px-4 py-3">
             <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">Penghuni</p>
@@ -60,17 +61,35 @@ export default function OwnerChatPage() {
         </div>
 
         <div className="flex flex-col">
-          {active && (
-            <div className="flex items-center gap-3 border-b border-line px-5 py-3">
-              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-light text-xs font-semibold text-brand">
-                {active.tenant?.name.split(" ").map((w) => w[0]).slice(0, 2).join("")}
-              </span>
-              <div>
-                <p className="text-sm font-semibold text-ink">{active.tenant?.name}</p>
-                <p className="text-xs text-ink-soft">Kamar {active.room?.room_number}</p>
+          {/* Header chat — desktop: info penghuni aktif, mobile: dropdown pilih penghuni */}
+          <div className="flex items-center gap-3 border-b border-line px-4 py-3">
+            {/* Dropdown pilih penghuni — hanya tampil di mobile */}
+            {tenancies.length > 0 && (
+              <select
+                value={effectiveTenancyId ?? ""}
+                onChange={(e) => setActiveTenancyId(Number(e.target.value))}
+                className="nm-input h-9 flex-1 rounded-xl px-3 text-sm text-ink outline-none md:hidden"
+              >
+                {tenancies.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.tenant?.name} · Kamar {t.room?.room_number}
+                  </option>
+                ))}
+              </select>
+            )}
+            {/* Info penghuni aktif — hanya tampil di desktop */}
+            {active && (
+              <div className="hidden items-center gap-3 md:flex">
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-light text-xs font-semibold text-brand">
+                  {active.tenant?.name.split(" ").map((w) => w[0]).slice(0, 2).join("")}
+                </span>
+                <div>
+                  <p className="text-sm font-semibold text-ink">{active.tenant?.name}</p>
+                  <p className="text-xs text-ink-soft">Kamar {active.room?.room_number}</p>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
           {effectiveTenancyId && user && (
             <ChatThread
               key={effectiveTenancyId}

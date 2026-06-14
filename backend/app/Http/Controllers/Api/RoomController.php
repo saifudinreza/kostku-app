@@ -34,7 +34,7 @@ class RoomController extends Controller
             : [];
 
         $rooms = Room::whereIn('property_id', $propertyIds)
-            ->with(['property', 'activeTenancy.tenant'])
+            ->with(['property', 'images', 'activeTenancy.tenant'])
             ->get();
 
         return response()->json($rooms);

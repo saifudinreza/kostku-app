@@ -2,22 +2,36 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, Loader2, Plus, XCircle } from "lucide-react";
+import { ArrowRight, CheckCircle2, Download, FileText, Loader2, Plus, Printer, XCircle } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Table, Td, Th, Tr } from "@/components/ui/Table";
 import { useInvoices, useGenerateMonthlyInvoices } from "@/lib/hooks/useInvoices";
+import { useExportInvoicesCsv } from "@/lib/hooks/useRooms";
 import { formatPeriode, formatRupiah, formatTanggal } from "@/lib/utils";
+import { api } from "@/lib/api";
 
 export default function OwnerInvoicesPage() {
   const { data: invoices = [], isLoading } = useInvoices();
   const generateMonthly = useGenerateMonthlyInvoices();
+  const exportCsv       = useExportInvoicesCsv();
 
   const [toast, setToast] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
   const unpaid = invoices.filter((i) => i.status === "unpaid" || i.status === "overdue");
+
+  async function handlePrintPdf() {
+    try {
+      const res  = await api.get<string>("/export/invoices/print", { responseType: "text" });
+      const win  = window.open("", "_blank");
+      win?.document.write(res.data);
+      win?.document.close();
+    } catch {
+      setToast({ type: "error", message: "Gagal membuka halaman print." });
+    }
+  }
 
   function handleGenerate() {
     setToast(null);
@@ -46,14 +60,32 @@ export default function OwnerInvoicesPage() {
         title="Tagihan"
         description={`${invoices.length} tagihan · ${unpaid.length} belum dibayar (${formatRupiah(unpaid.reduce((s, i) => s + i.total_amount, 0))})`}
         action={
-          <Button onClick={handleGenerate} disabled={generateMonthly.isPending}>
-            {generateMonthly.isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Plus className="h-4 w-4" />
-            )}
-            Generate Tagihan
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => exportCsv.mutate()}
+              disabled={exportCsv.isPending || invoices.length === 0}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-line bg-page px-3 py-2 text-sm font-semibold text-ink-soft hover:border-brand hover:text-brand transition-colors disabled:opacity-50"
+            >
+              {exportCsv.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+              CSV
+            </button>
+            <button
+              onClick={handlePrintPdf}
+              disabled={invoices.length === 0}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-line bg-page px-3 py-2 text-sm font-semibold text-ink-soft hover:border-brand hover:text-brand transition-colors disabled:opacity-50"
+            >
+              <Printer className="h-4 w-4" />
+              Print PDF
+            </button>
+            <Button onClick={handleGenerate} disabled={generateMonthly.isPending}>
+              {generateMonthly.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Plus className="h-4 w-4" />
+              )}
+              Generate Tagihan
+            </Button>
+          </div>
         }
       />
 
@@ -85,6 +117,14 @@ export default function OwnerInvoicesPage() {
         {isLoading ? (
           <div className="flex h-40 items-center justify-center">
             <Loader2 className="h-6 w-6 animate-spin text-brand" />
+          </div>
+        ) : invoices.length === 0 ? (
+          <div className="flex flex-col items-center gap-3 p-12 text-center">
+            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-light text-brand">
+              <FileText className="h-6 w-6" />
+            </span>
+            <p className="font-medium text-ink">Belum ada tagihan</p>
+            <p className="text-sm text-ink-soft">Klik "Generate Tagihan" untuk membuat tagihan bulan ini secara otomatis.</p>
           </div>
         ) : (
           <Table>

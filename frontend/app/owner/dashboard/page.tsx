@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, BedDouble, DoorOpen, Loader2, Sparkles, TrendingUp, Wallet } from "lucide-react";
+import { ArrowRight, BedDouble, DoorOpen, Loader2, TrendingUp, Wallet } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { StatCard } from "@/components/shared/StatCard";
 import { StatusBadge } from "@/components/shared/StatusBadge";
@@ -54,23 +54,6 @@ export default function OwnerDashboard() {
         />
       </div>
 
-      <Card className="border-brand/20 bg-brand-light/50">
-        <div className="flex items-start gap-3 p-5">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand text-white">
-            <Sparkles className="h-5 w-5" />
-          </span>
-          <div>
-            <h3 className="text-sm font-semibold text-ink">AI Financial Insight</h3>
-            <p className="mt-1 text-sm text-ink-soft">
-              Tingkat hunian saat ini {d.occupancy_rate}% ({occupied}/{totalRooms} kamar).
-              {d.overdue_invoices > 0
-                ? ` Terdapat ${d.overdue_invoices} tagihan overdue yang perlu ditindaklanjuti.`
-                : " Semua tagihan dalam kondisi baik."}
-            </p>
-          </div>
-        </div>
-      </Card>
-
       <div className="grid gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader
@@ -111,9 +94,9 @@ export default function OwnerDashboard() {
           <CardHeader title="Status Kamar" />
           <div className="space-y-4 p-5">
             {[
-              { label: "Terisi", value: occupied, color: "bg-[#6D28D9]" },
-              { label: "Tersedia", value: available, color: "bg-[#0F766E]" },
-              { label: "Maintenance", value: maintenance, color: "bg-[#92400E]" },
+              { label: "Terisi",      value: occupied,    color: "bg-brand" },
+              { label: "Tersedia",    value: available,   color: "bg-success" },
+              { label: "Maintenance", value: maintenance, color: "bg-warning" },
             ].map((s) => (
               <div key={s.label}>
                 <div className="mb-1 flex items-center justify-between text-sm">

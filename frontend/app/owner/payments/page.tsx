@@ -1,23 +1,40 @@
 "use client";
 
-import { CreditCard, Loader2 } from "lucide-react";
+"use client";
+
+import { CreditCard, Download, Loader2 } from "lucide-react";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { StatCard } from "@/components/shared/StatCard";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Card } from "@/components/ui/Card";
 import { Table, Td, Th, Tr } from "@/components/ui/Table";
 import { usePayments } from "@/lib/hooks/usePayments";
+import { useExportPaymentsCsv } from "@/lib/hooks/useRooms";
 import { formatRupiah, formatTanggal } from "@/lib/utils";
 
 export default function OwnerPaymentsPage() {
   const { data: payments = [], isLoading } = usePayments();
+  const exportCsv = useExportPaymentsCsv();
 
   const received = payments.filter((p) => p.status === "success").reduce((s, p) => s + p.amount, 0);
   const pending = payments.filter((p) => p.status === "pending").length;
 
   return (
     <>
-      <PageHeader title="Pembayaran" description="Riwayat transaksi via Midtrans." />
+      <PageHeader
+        title="Pembayaran"
+        description="Riwayat transaksi via Midtrans."
+        action={
+          <button
+            onClick={() => exportCsv.mutate()}
+            disabled={exportCsv.isPending || payments.length === 0}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-line bg-page px-3 py-2 text-sm font-semibold text-ink-soft hover:border-brand hover:text-brand transition-colors disabled:opacity-50"
+          >
+            {exportCsv.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+            Export CSV
+          </button>
+        }
+      />
 
       <div className="grid gap-4 sm:grid-cols-3">
         <StatCard
@@ -35,6 +52,14 @@ export default function OwnerPaymentsPage() {
         {isLoading ? (
           <div className="flex h-40 items-center justify-center">
             <Loader2 className="h-6 w-6 animate-spin text-brand" />
+          </div>
+        ) : payments.length === 0 ? (
+          <div className="flex flex-col items-center gap-3 p-12 text-center">
+            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-light text-brand">
+              <CreditCard className="h-6 w-6" />
+            </span>
+            <p className="font-medium text-ink">Belum ada transaksi</p>
+            <p className="text-sm text-ink-soft">Riwayat pembayaran via Midtrans akan muncul di sini.</p>
           </div>
         ) : (
           <Table>

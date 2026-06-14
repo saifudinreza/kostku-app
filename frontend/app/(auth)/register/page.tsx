@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import type { UserRole } from "@/types";
 
@@ -13,6 +13,8 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
+  const [showPw, setShowPw] = useState(false);
+  const [showConfirmPw, setShowConfirmPw] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -88,28 +90,48 @@ export default function RegisterPage() {
         </div>
         <div>
           <label className="mb-1.5 block text-sm font-bold text-ink">Password</label>
-          <input
-            type="password"
-            required
-            minLength={8}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="nm-input h-11 w-full rounded-xl px-3.5 text-sm text-ink outline-none"
-            placeholder="Minimal 8 karakter"
-          />
+          <div className="relative">
+            <input
+              type={showPw ? "text" : "password"}
+              required
+              minLength={8}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="nm-input h-11 w-full rounded-xl px-3.5 pr-10 text-sm text-ink outline-none"
+              placeholder="Minimal 8 karakter"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPw((s) => !s)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-soft hover:text-ink"
+              aria-label="Tampilkan password"
+            >
+              {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
         </div>
         <div>
           <label className="mb-1.5 block text-sm font-bold text-ink">
             Ulangi password
           </label>
-          <input
-            type="password"
-            required
-            value={passwordConfirmation}
-            onChange={(e) => setPasswordConfirmation(e.target.value)}
-            className="nm-input h-11 w-full rounded-xl px-3.5 text-sm text-ink outline-none"
-            placeholder="••••••••"
-          />
+          <div className="relative">
+            <input
+              type={showConfirmPw ? "text" : "password"}
+              required
+              value={passwordConfirmation}
+              onChange={(e) => setPasswordConfirmation(e.target.value)}
+              className="nm-input h-11 w-full rounded-xl px-3.5 pr-10 text-sm text-ink outline-none"
+              placeholder="••••••••"
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPw((s) => !s)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-soft hover:text-ink"
+              aria-label="Tampilkan konfirmasi password"
+            >
+              {showConfirmPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
         </div>
 
         {error && (

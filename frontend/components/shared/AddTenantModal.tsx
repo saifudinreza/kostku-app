@@ -14,16 +14,19 @@ import { X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useAllRooms } from "@/lib/hooks/useRooms";
 import { useCreateTenancy } from "@/lib/hooks/useTenancies";
+import { useFocusTrap } from "@/lib/hooks/useFocusTrap";
 import { formatRupiah } from "@/lib/utils";
 
 interface Props {
   open: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
 }
 
-export function AddTenantModal({ open, onClose }: Props) {
+export function AddTenantModal({ open, onClose, onSuccess }: Props) {
   const { data: rooms = [], isLoading: roomsLoading } = useAllRooms();
   const createTenancy = useCreateTenancy();
+  const trapRef = useFocusTrap(open, onClose);
 
   // Field form
   const [tenantEmail, setTenantEmail] = useState("");
@@ -67,6 +70,7 @@ export function AddTenantModal({ open, onClose }: Props) {
         deposit: deposit ? Number(deposit) : undefined,
       });
       handleClose();
+      onSuccess?.();
     } catch (err: unknown) {
       const msg =
         (err as { response?: { data?: { message?: string } } })?.response?.data
@@ -79,19 +83,22 @@ export function AddTenantModal({ open, onClose }: Props) {
   if (!open) return null;
 
   return (
-    // Overlay gelap di belakang modal — klik di luar untuk tutup
     <div
+      ref={trapRef}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="tenant-modal-title"
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
       onClick={(e) => {
         if (e.target === e.currentTarget) handleClose();
       }}
     >
       <div className="w-full max-w-md rounded-2xl bg-page shadow-2xl">
-        {/* Header modal */}
         <div className="flex items-center justify-between border-b border-line px-6 py-4">
-          <h2 className="text-base font-bold text-ink">Tambah Penghuni</h2>
+          <h2 id="tenant-modal-title" className="text-base font-bold text-ink">Tambah Penghuni</h2>
           <button
             onClick={handleClose}
+            aria-label="Tutup modal"
             className="rounded-lg p-1 text-ink-soft hover:bg-line hover:text-ink"
           >
             <X className="h-5 w-5" />
@@ -99,12 +106,12 @@ export function AddTenantModal({ open, onClose }: Props) {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4 p-6">
-          {/* Email penghuni */}
           <div>
-            <label className="mb-1.5 block text-sm font-bold text-ink">
+            <label htmlFor="tenant-email" className="mb-1.5 block text-sm font-bold text-ink">
               Email Penghuni
             </label>
             <input
+              id="tenant-email"
               type="email"
               required
               value={tenantEmail}
@@ -117,9 +124,8 @@ export function AddTenantModal({ open, onClose }: Props) {
             </p>
           </div>
 
-          {/* Pilih kamar */}
           <div>
-            <label className="mb-1.5 block text-sm font-bold text-ink">
+            <label htmlFor="tenant-room" className="mb-1.5 block text-sm font-bold text-ink">
               Kamar
             </label>
             {roomsLoading ? (
@@ -133,6 +139,7 @@ export function AddTenantModal({ open, onClose }: Props) {
               </p>
             ) : (
               <select
+                id="tenant-room"
                 required
                 value={roomId}
                 onChange={(e) => setRoomId(e.target.value)}
@@ -152,12 +159,12 @@ export function AddTenantModal({ open, onClose }: Props) {
             )}
           </div>
 
-          {/* Tanggal masuk */}
           <div>
-            <label className="mb-1.5 block text-sm font-bold text-ink">
+            <label htmlFor="tenant-start" className="mb-1.5 block text-sm font-bold text-ink">
               Tanggal Masuk
             </label>
             <input
+              id="tenant-start"
               type="date"
               required
               value={startDate}
@@ -166,13 +173,13 @@ export function AddTenantModal({ open, onClose }: Props) {
             />
           </div>
 
-          {/* Tanggal keluar (opsional) */}
           <div>
-            <label className="mb-1.5 block text-sm font-bold text-ink">
+            <label htmlFor="tenant-end" className="mb-1.5 block text-sm font-bold text-ink">
               Tanggal Keluar{" "}
               <span className="font-normal text-ink-soft">(opsional)</span>
             </label>
             <input
+              id="tenant-end"
               type="date"
               value={endDate}
               min={startDate}
@@ -181,9 +188,8 @@ export function AddTenantModal({ open, onClose }: Props) {
             />
           </div>
 
-          {/* Deposit (opsional) */}
           <div>
-            <label className="mb-1.5 block text-sm font-bold text-ink">
+            <label htmlFor="tenant-deposit" className="mb-1.5 block text-sm font-bold text-ink">
               Deposit{" "}
               <span className="font-normal text-ink-soft">(opsional)</span>
             </label>
@@ -192,6 +198,7 @@ export function AddTenantModal({ open, onClose }: Props) {
                 Rp
               </span>
               <input
+                id="tenant-deposit"
                 type="number"
                 min={0}
                 value={deposit}
