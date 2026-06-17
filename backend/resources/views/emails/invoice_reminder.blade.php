@@ -57,7 +57,7 @@
 
             <p>Harap segera melakukan pembayaran sebelum tanggal jatuh tempo untuk menghindari denda.</p>
 
-            <a href="{{ env('APP_URL', 'http://localhost:3000') }}/tenant/invoices/{{ $invoice->id }}" class="cta">
+            <a href="{{ env('FRONTEND_URL', 'http://localhost:3000') }}/tenant/invoices/{{ $invoice->id }}" class="cta">
                 Bayar Sekarang
             </a>
 

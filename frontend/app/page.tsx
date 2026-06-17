@@ -1,30 +1,25 @@
 import Link from "next/link";
 import {
   ArrowRight,
-  ArrowUp,
   BarChart3,
   Briefcase,
   Building2,
   CheckCircle2,
   LayoutDashboard,
-  MessageCircleHeart,
   MessagesSquare,
   Play,
   ReceiptText,
-  Sparkles,
   Star,
-  TrendingUp,
   UserRound,
   WandSparkles,
   Wallet,
   X,
-  Zap,
 } from "lucide-react";
 import { LandingNav } from "@/components/landing/LandingNav";
-import { HeroChat } from "@/components/landing/HeroChat";
 import { Reveal } from "@/components/landing/Reveal";
 import { KostBackground } from "@/components/landing/KostBackground";
 import { LandingScrollEffects } from "@/components/landing/LandingScrollEffects";
+import { HeroMockup3D } from "@/components/landing/HeroMockup3D";
 
 // =============================================================================
 // LandingPage — halaman depan (etalase) yang dilihat pengunjung di "/".
@@ -47,8 +42,8 @@ const FEATURES = [
   },
   {
     icon: Building2,
-    title: "Multi-Properti & Kamar",
-    desc: "Kelola banyak kost sekaligus. Atur kamar, harga, status, dan foto dengan mudah.",
+    title: "Multi-Properti & Foto Kamar",
+    desc: "Kelola banyak kost sekaligus. Atur kamar, harga, status, dan upload foto langsung dari dashboard.",
   },
   {
     icon: ReceiptText,
@@ -67,8 +62,8 @@ const FEATURES = [
   },
   {
     icon: BarChart3,
-    title: "Laporan & Reminder",
-    desc: "Grafik pendapatan & occupancy. Reminder email otomatis H-7 dan H-1 jatuh tempo.",
+    title: "Laporan & Export",
+    desc: "Export tagihan & pembayaran ke CSV atau PDF. Reminder email otomatis H-7 dan H-1 jatuh tempo.",
   },
 ];
 
@@ -95,28 +90,6 @@ const PROBLEMS = [
       "Tidak ada bukti bayar yang tersimpan dan mudah dicari",
       "Susah lapor kerusakan kamar, harus chat ke nomor pribadi",
     ],
-  },
-];
-
-// Tiga fitur ber-AI yang ditonjolkan (bagian "Ditenagai AI").
-const AI_FEATURES = [
-  {
-    icon: MessageCircleHeart,
-    title: "Smart Invoice Assistant",
-    desc: "Penghuni bisa tanya apa pun soal tagihannya. AI tahu data tagihan kamu dan menjawab langsung.",
-    snippet: '"Kenapa tagihan bulan ini naik?"',
-  },
-  {
-    icon: WandSparkles,
-    title: "Room Description Generator",
-    desc: "Input data kamar, AI tuliskan deskripsi marketing menarik. Kamar kosong cepat terisi.",
-    snippet: "3x4 · AC · WiFi → deskripsi siap",
-  },
-  {
-    icon: TrendingUp,
-    title: "AI Financial Insight",
-    desc: "AI analisis keuangan kost-mu dalam Bahasa Indonesia, lengkap dengan proyeksi bulan depan.",
-    snippet: '"Pendapatan Juni turun 15%…"',
   },
 ];
 
@@ -154,23 +127,18 @@ const TESTIMONIALS = [
     name: "Budi",
     role: "Penghuni · Mahasiswa",
     quote:
-      "Bayar kost sekarang dari HP pakai QRIS, ada reminder otomatis, dan kalau bingung tagihan tinggal tanya AI-nya. Gampang banget.",
+      "Bayar kost sekarang dari HP pakai QRIS, ada reminder email sebelum jatuh tempo, dan riwayat tagihan tersimpan rapi. Gampang banget.",
   },
   {
     initial: "S",
     name: "Bu Sari",
     role: "Pemilik Kost · Yogyakarta",
     quote:
-      "AI Financial Insight bantu saya lihat tren pendapatan tiap bulan. Deskripsi kamar pun tinggal generate, kamar cepat terisi.",
+      "Foto kamar bisa langsung diupload, deskripsi tinggal generate lewat AI. Kamar kosong jadi cepat terisi karena tampilannya lebih menarik.",
   },
 ];
 
-// Angka statistik mini di kartu mockup hero (`accent` = ditampilkan warna ungu).
-const HERO_STATS = [
-  { label: "Total Kamar", value: "20", accent: false },
-  { label: "Terisi", value: "18", accent: true },
-  { label: "Pendapatan", value: "4,2", suffix: "jt", accent: false },
-];
+
 
 // Tiga poin kepercayaan di bawah tombol utama (mis. "Gratis untuk mulai").
 const HERO_TRUST = ["Gratis untuk mulai", "Tanpa kartu kredit", "Setup 5 menit"];
@@ -198,135 +166,108 @@ export default function LandingPage() {
       {/* ============ HERO ============ */}
       <section
         data-snap
-        className="relative isolate overflow-hidden pb-[72px] pt-20"
+        className="relative isolate overflow-hidden pb-[80px] pt-20"
       >
         <KostBackground />
-        <div className="relative z-10 mx-auto grid max-w-[1180px] items-center gap-14 px-6 lg:grid-cols-[1.05fr_1fr]">
-          <Reveal>
-          <Pill>
-            <span
-              className="h-2 w-2 rounded-full"
-              style={{ background: "#6c5ce7", boxShadow: "0 0 8px #8b7bff" }}
-            />
-            <span className="text-[12.5px] font-bold uppercase tracking-[0.4px] text-[#6c5ce7]">
-              Kini dengan Asisten AI
-            </span>
-          </Pill>
-          <h1
-            className="m-0 mb-[22px] text-[clamp(40px,6vw,54px)] font-extrabold leading-[1.05] tracking-[-1.5px] text-[#2f3148] text-balance"
-            style={{ textShadow: "0 1px 22px rgba(233,234,242,0.95)" }}
-          >
-            Atur kost-mu
-            <br />
-            tanpa drama.
-          </h1>
-          <p
-            className="m-0 mb-[34px] max-w-[480px] text-lg leading-[1.65] text-[#5b5e7a] text-pretty"
-            style={{ textShadow: "0 1px 16px rgba(233,234,242,0.9)" }}
-          >
-            Satu dashboard untuk pemilik & penghuni — kelola kamar, tagihan, dan
-            pembayaran online. Lengkap dengan asisten AI yang siap menjawab soal
-            tagihan kapan saja.
-          </p>
-          <div className="mb-7 flex flex-wrap items-center gap-4">
-            <Link
-              href="/register"
-              className="kk-btn kk-btn-primary inline-flex items-center gap-[9px] rounded-[15px] px-[30px] py-4 text-base font-bold"
-            >
-              Mulai Gratis
-              <ArrowRight className="h-[18px] w-[18px]" />
-            </Link>
-            <Link
-              href="/owner/dashboard"
-              className="kk-btn kk-btn-soft inline-flex items-center gap-[9px] rounded-[15px] px-7 py-4 text-base font-bold"
-            >
-              <Play className="h-[17px] w-[17px] text-[#6c5ce7]" />
-              Lihat Demo
-            </Link>
-          </div>
-          <div className="flex flex-wrap items-center gap-[22px]">
-            {HERO_TRUST.map((t) => (
-              <div
-                key={t}
-                className="flex items-center gap-2 text-[13.5px] font-semibold text-[#797d99]"
-              >
-                <CheckCircle2 className="h-[17px] w-[17px] text-[#6c5ce7]" />
-                {t}
-              </div>
-            ))}
-          </div>
-        </Reveal>
 
-        {/* HERO MOCKUP CARD */}
-        <Reveal delay={120} className="relative">
+        {/* Large ambient orbs — reinforce depth behind the 3D card */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
           <div
-            className="absolute right-[18px] top-[-18px] z-[3] inline-flex items-center gap-2 rounded-full px-[15px] py-[9px] kk-floaty nm-raised-sm"
-          >
-            <Zap className="h-[15px] w-[15px] text-[#6c5ce7]" />
-            <span className="text-[11.5px] font-bold text-[#5a5d78]">
-              Ditenagai Groq · LLaMA 3.3
-            </span>
-          </div>
-          <div className="rounded-[30px] p-[22px] nm-raised-lg">
-            {/* mini stats */}
-            <div className="mb-[18px] grid grid-cols-3 gap-3">
-              {HERO_STATS.map((s) => (
-                <div key={s.label} className="rounded-2xl p-3.5 nm-inset">
-                  <div className="mb-1.5 text-[11px] font-semibold text-[#8c8fab]">
-                    {s.label}
-                  </div>
-                  <div
-                    className="text-[22px] font-extrabold"
-                    style={{ color: s.accent ? "#6c5ce7" : "#2f3148" }}
-                  >
-                    {s.value}
-                    {s.suffix && (
-                      <span className="text-[13px] font-semibold text-[#8c8fab]">
-                        {s.suffix}
-                      </span>
-                    )}
-                  </div>
+            className="kk-blob kk-hero-orb-a absolute"
+            style={{
+              width: "640px",
+              height: "640px",
+              left: "-160px",
+              top: "-140px",
+              background:
+                "radial-gradient(circle, rgba(139,123,255,0.28) 0%, transparent 70%)",
+            }}
+          />
+          <div
+            className="kk-blob kk-hero-orb-b absolute"
+            style={{
+              width: "480px",
+              height: "480px",
+              right: "-80px",
+              top: "10%",
+              background:
+                "radial-gradient(circle, rgba(108,92,231,0.2) 0%, transparent 70%)",
+            }}
+          />
+          <div
+            className="kk-blob kk-hero-orb-c absolute"
+            style={{
+              width: "520px",
+              height: "520px",
+              right: "15%",
+              bottom: "-160px",
+              background:
+                "radial-gradient(circle, rgba(167,139,250,0.18) 0%, transparent 70%)",
+            }}
+          />
+        </div>
+
+        <div className="relative z-10 mx-auto grid max-w-[1180px] items-center gap-10 px-6 lg:grid-cols-[1.05fr_1fr] lg:gap-14">
+          {/* ---- Left column: text ---- */}
+          <Reveal>
+            <Pill>
+              <span
+                className="h-2 w-2 rounded-full"
+                style={{ background: "#6c5ce7", boxShadow: "0 0 8px #8b7bff" }}
+              />
+              <span className="text-[12.5px] font-bold uppercase tracking-[0.4px] text-[#6c5ce7]">
+                Kini dengan Asisten AI
+              </span>
+            </Pill>
+            <h1
+              className="m-0 mb-[22px] text-[clamp(38px,5.5vw,56px)] font-extrabold leading-[1.05] tracking-[-1.5px] text-[#2f3148] text-balance"
+              style={{ textShadow: "0 1px 22px rgba(233,234,242,0.95)" }}
+            >
+              Atur kost-mu
+              <br />
+              <span className="kk-shimmer-text">tanpa drama.</span>
+            </h1>
+            <p
+              className="m-0 mb-[34px] max-w-[480px] text-lg leading-[1.65] text-[#5b5e7a] text-pretty"
+              style={{ textShadow: "0 1px 16px rgba(233,234,242,0.9)" }}
+            >
+              Satu dashboard untuk pemilik & penghuni — kelola kamar, tagihan,
+              dan pembayaran online. Dengan asisten AI untuk deskripsi kamar
+              yang menarik.
+            </p>
+            <div className="mb-7 flex flex-wrap items-center gap-4">
+              <Link
+                href="/register"
+                className="kk-btn kk-btn-primary inline-flex items-center gap-[9px] rounded-[15px] px-[30px] py-4 text-base font-bold"
+              >
+                Mulai Gratis
+                <ArrowRight className="h-[18px] w-[18px]" />
+              </Link>
+              <Link
+                href="/owner/dashboard"
+                className="kk-btn kk-btn-soft inline-flex items-center gap-[9px] rounded-[15px] px-7 py-4 text-base font-bold"
+              >
+                <Play className="h-[17px] w-[17px] text-[#6c5ce7]" />
+                Lihat Demo
+              </Link>
+            </div>
+            <div className="flex flex-wrap items-center gap-[22px]">
+              {HERO_TRUST.map((t) => (
+                <div
+                  key={t}
+                  className="flex items-center gap-2 text-[13.5px] font-semibold text-[#797d99]"
+                >
+                  <CheckCircle2 className="h-[17px] w-[17px] text-[#6c5ce7]" />
+                  {t}
                 </div>
               ))}
             </div>
-            {/* assistant header */}
-            <div className="flex items-center gap-3 px-1 pb-4 pt-1">
-              <div
-                className="flex h-10 w-10 items-center justify-center rounded-[13px] text-white nm-raised-sm"
-                style={{ background: "linear-gradient(135deg,#8b7bff,#6c5ce7)" }}
-              >
-                <Sparkles className="h-5 w-5" />
-              </div>
-              <div className="flex-1">
-                <div className="text-[15px] font-extrabold text-[#2f3148]">
-                  Smart Invoice Assistant
-                </div>
-                <div className="flex items-center gap-1.5 text-xs font-semibold text-[#16a34a]">
-                  <span className="h-[7px] w-[7px] rounded-full bg-[#16a34a]" />
-                  Online
-                </div>
-              </div>
-            </div>
-            {/* chat body (live typed demo) */}
-            <HeroChat />
-            {/* input bar */}
-            <div className="mt-4 flex items-center gap-2.5 rounded-2xl py-[7px] pl-[18px] pr-[7px] nm-inset">
-              <span className="flex-1 text-[13.5px] text-[#9a9db8]">
-                Tanya soal tagihanmu…
-              </span>
-              <button
-                className="flex h-10 w-10 items-center justify-center rounded-xl text-white"
-                style={{
-                  background: "linear-gradient(135deg,#8b7bff,#6c5ce7)",
-                  boxShadow: "4px 4px 10px #c6c8d8",
-                }}
-                aria-label="Kirim"
-              >
-                <ArrowUp className="h-[18px] w-[18px]" />
-              </button>
-            </div>
-          </div>
-        </Reveal>
+          </Reveal>
+
+          {/* ---- Right column: 3D animated mockup ---- */}
+          <Reveal delay={100}>
+            <HeroMockup3D />
+          </Reveal>
         </div>
       </section>
 
@@ -422,53 +363,79 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ============ AI FEATURES ============ */}
+      {/* ============ AI FEATURE ============ */}
       <section id="ai" data-snap className="px-6 py-20">
-        <div className="mx-auto max-w-[1180px] rounded-[34px] px-12 py-[60px] nm-inset-lg">
-          <Reveal className="mx-auto mb-[50px] max-w-[660px] text-center">
-            <div
-              className="mb-[22px] inline-flex items-center gap-[9px] rounded-full px-[18px] py-[9px] nm-raised-sm"
-              style={{ background: "linear-gradient(135deg,#8b7bff,#6c5ce7)" }}
-            >
-              <Sparkles className="h-[15px] w-[15px] text-white" />
-              <span className="text-[12.5px] font-bold uppercase tracking-[0.4px] text-white">
-                Ditenagai AI
-              </span>
-            </div>
-            <h2 className="m-0 mb-4 text-[38px] font-extrabold leading-[1.12] tracking-[-1px] text-[#2f3148] text-balance">
-              Bukan sekadar aplikasi manajemen
-            </h2>
-            <p className="m-0 text-[17px] leading-[1.6] text-[#6b6e8a] text-pretty">
-              Tiga asisten cerdas ber-AI yang bantu owner & penghuni ambil
-              keputusan lebih baik — ditenagai Groq + LLaMA 3.3 70B.
-            </p>
-          </Reveal>
-          <div className="grid gap-6 md:grid-cols-3">
-            {AI_FEATURES.map((f, idx) => {
-              const Icon = f.icon;
-              return (
-                <Reveal key={f.title} delay={idx * 100}>
-                  <div className="kk-card h-full rounded-[24px] p-8 nm-raised">
-                    <div
-                      className="mb-[22px] flex h-14 w-14 items-center justify-center rounded-[17px] text-white nm-raised-sm"
-                      style={{ background: "linear-gradient(135deg,#8b7bff,#6c5ce7)" }}
-                    >
-                      <Icon className="h-[26px] w-[26px]" />
-                    </div>
-                    <h3 className="m-0 mb-2.5 text-[18.5px] font-extrabold text-[#2f3148]">
-                      {f.title}
-                    </h3>
-                    <p className="m-0 mb-4 text-[14.5px] leading-[1.6] text-[#797d99]">
-                      {f.desc}
-                    </p>
-                    <div className="rounded-xl px-3.5 py-3 font-mono text-xs text-[#6c5ce7] nm-inset">
-                      {f.snippet}
-                    </div>
+        <div className="mx-auto max-w-[1180px] rounded-[34px] px-8 py-[52px] nm-inset-lg md:px-12">
+          <Reveal className="grid items-center gap-12 lg:grid-cols-[1.1fr_1fr]">
+            {/* Kiri: deskripsi */}
+            <div>
+              <div
+                className="mb-6 inline-flex items-center gap-[9px] rounded-full px-[18px] py-[9px] nm-raised-sm"
+                style={{ background: "linear-gradient(135deg,#8b7bff,#6c5ce7)" }}
+              >
+                <WandSparkles className="h-[14px] w-[14px] text-white" />
+                <span className="text-[12px] font-bold uppercase tracking-[0.4px] text-white">
+                  Fitur AI
+                </span>
+              </div>
+              <h2 className="m-0 mb-4 text-[34px] font-extrabold leading-[1.12] tracking-[-1px] text-[#2f3148] text-balance">
+                Deskripsi kamar menarik dalam 3 detik
+              </h2>
+              <p className="m-0 mb-7 text-[16px] leading-[1.65] text-[#6b6e8a] text-pretty">
+                Isi data kamar — nomor, lantai, harga, fasilitas — dan AI tuliskan
+                deskripsi marketing yang siap dipakai. Tidak perlu bingung mau nulis apa.
+              </p>
+              <div className="flex flex-col gap-3">
+                {[
+                  "2–3 kalimat persuasif dalam Bahasa Indonesia",
+                  "Menyebut fasilitas utama dan harga sewa",
+                  "Langsung bisa disalin ke platform iklan kost",
+                ].map((pt) => (
+                  <div key={pt} className="flex items-start gap-3">
+                    <CheckCircle2 className="mt-[2px] h-[17px] w-[17px] shrink-0 text-[#6c5ce7]" />
+                    <span className="text-[14.5px] leading-[1.5] text-[#5a5d78]">{pt}</span>
                   </div>
-                </Reveal>
-              );
-            })}
-          </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Kanan: preview card */}
+            <div className="rounded-[26px] p-7 nm-raised">
+              <p className="mb-3 text-[11px] font-extrabold uppercase tracking-[0.5px] text-[#8c8fab]">
+                Input
+              </p>
+              <div className="mb-5 grid grid-cols-2 gap-2">
+                {["Nomor: 101", "Lantai: 2", "Harga: Rp 850.000", "AC · WiFi · KM Dalam"].map(
+                  (item) => (
+                    <div
+                      key={item}
+                      className="rounded-xl px-3 py-2 text-[12px] text-[#5a5d78] nm-inset"
+                    >
+                      {item}
+                    </div>
+                  ),
+                )}
+              </div>
+              <div className="mb-5 flex items-center gap-3">
+                <div className="h-px flex-1 bg-[#e0e1ef]" />
+                <div
+                  className="flex h-8 w-8 items-center justify-center rounded-full text-white"
+                  style={{ background: "linear-gradient(135deg,#8b7bff,#6c5ce7)" }}
+                >
+                  <WandSparkles className="h-[14px] w-[14px]" />
+                </div>
+                <div className="h-px flex-1 bg-[#e0e1ef]" />
+              </div>
+              <p className="mb-2 text-[11px] font-extrabold uppercase tracking-[0.5px] text-[#8c8fab]">
+                Hasil AI
+              </p>
+              <p className="text-[13.5px] italic leading-[1.7] text-[#3a3d55]">
+                &ldquo;Kamar nyaman di lantai 2 dengan AC dan WiFi cepat. Dilengkapi kamar
+                mandi dalam untuk privasi lebih. Cocok untuk profesional muda — mulai
+                Rp&nbsp;850.000/bulan.&rdquo;
+              </p>
+            </div>
+          </Reveal>
         </div>
       </section>
 
