@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -59,5 +60,37 @@ class AuthController extends Controller
     public function me(Request $request): JsonResponse
     {
         return response()->json($request->user());
+    }
+
+    public function updateProfile(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        $data = $request->validate([
+            'name'  => 'required|string|max:255',
+            'phone' => 'nullable|string|max:20',
+        ]);
+
+        $user->update($data);
+
+        return response()->json($user->fresh());
+    }
+
+    public function changePassword(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        $request->validate([
+            'current_password' => 'required|string',
+            'new_password'     => 'required|string|min:8|confirmed',
+        ]);
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json(['message' => 'Password lama tidak sesuai.'], 422);
+        }
+
+        $user->update(['password' => Hash::make($request->new_password)]);
+
+        return response()->json(['message' => 'Password berhasil diubah.']);
     }
 }

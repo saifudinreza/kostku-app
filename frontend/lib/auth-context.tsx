@@ -24,6 +24,7 @@ interface AuthContextValue {
     role: UserRole
   ) => Promise<void>;
   logout: () => Promise<void>;
+  updateUser: (updated: User) => void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -82,6 +83,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [router]
   );
 
+  const updateUser = useCallback((updated: User) => {
+    localStorage.setItem("auth_user", JSON.stringify(updated));
+    setUser(updated);
+  }, []);
+
   const logout = useCallback(async () => {
     try {
       await api.post("/auth/logout");
@@ -96,7 +102,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [router]);
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, token, loading, login, register, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

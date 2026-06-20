@@ -8,7 +8,8 @@ import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Table, Td, Th, Tr } from "@/components/ui/Table";
 import { useOwnerStats } from "@/lib/hooks/useDashboard";
-import { formatPeriode, formatRupiah, formatTanggal } from "@/lib/utils";
+import { RevenueChart, OccupancyChart } from "@/components/shared/DashboardCharts";
+import { formatRupiah, formatTanggal } from "@/lib/utils";
 
 export default function OwnerDashboard() {
   const { data, isLoading } = useOwnerStats();
@@ -54,66 +55,62 @@ export default function OwnerDashboard() {
         />
       </div>
 
+      {/* Charts row */}
       <div className="grid gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2">
-          <CardHeader
-            title="Tagihan Terbaru"
-            action={
-              <Link href="/owner/invoices" className="flex items-center gap-1 text-sm font-medium text-brand hover:underline">
-                Semua <ArrowRight className="h-4 w-4" />
-              </Link>
-            }
-          />
-          <Table>
-            <thead>
-              <tr>
-                <Th>No. Invoice</Th>
-                <Th>Penghuni</Th>
-                <Th>Kamar</Th>
-                <Th>Jatuh Tempo</Th>
-                <Th className="text-right">Total</Th>
-                <Th>Status</Th>
-              </tr>
-            </thead>
-            <tbody>
-              {d.recent_invoices.map((inv) => (
-                <Tr key={inv.id}>
-                  <Td className="font-mono text-xs">{inv.invoice_number}</Td>
-                  <Td className="font-medium text-ink">{inv.tenant_name}</Td>
-                  <Td className="text-ink-soft">Kamar {inv.room_number}</Td>
-                  <Td className="text-ink-soft">{formatTanggal(inv.due_date)}</Td>
-                  <Td className="text-right font-medium">{formatRupiah(inv.total_amount)}</Td>
-                  <Td><StatusBadge status={inv.status as never} /></Td>
-                </Tr>
-              ))}
-            </tbody>
-          </Table>
+          <CardHeader title="Pendapatan 6 Bulan Terakhir" />
+          <div className="px-4 pb-4 pt-2">
+            <RevenueChart />
+          </div>
         </Card>
 
         <Card>
           <CardHeader title="Status Kamar" />
-          <div className="space-y-4 p-5">
-            {[
-              { label: "Terisi",      value: occupied,    color: "bg-brand" },
-              { label: "Tersedia",    value: available,   color: "bg-success" },
-              { label: "Maintenance", value: maintenance, color: "bg-warning" },
-            ].map((s) => (
-              <div key={s.label}>
-                <div className="mb-1 flex items-center justify-between text-sm">
-                  <span className="text-ink-soft">{s.label}</span>
-                  <span className="font-semibold text-ink">{s.value}</span>
-                </div>
-                <div className="h-2.5 overflow-hidden rounded-full [box-shadow:inset_2px_2px_5px_#d0d2e2,inset_-2px_-2px_5px_#ffffff]">
-                  <div
-                    className={`h-full rounded-full ${s.color}`}
-                    style={{ width: totalRooms > 0 ? `${(s.value / totalRooms) * 100}%` : "0%" }}
-                  />
-                </div>
-              </div>
-            ))}
+          <div className="px-2 pb-2 pt-1">
+            <OccupancyChart
+              occupied={occupied}
+              available={available}
+              maintenance={maintenance}
+            />
           </div>
         </Card>
       </div>
+
+      {/* Recent invoices */}
+      <Card>
+        <CardHeader
+          title="Tagihan Terbaru"
+          action={
+            <Link href="/owner/invoices" className="flex items-center gap-1 text-sm font-medium text-brand hover:underline">
+              Semua <ArrowRight className="h-4 w-4" />
+            </Link>
+          }
+        />
+        <Table>
+          <thead>
+            <tr>
+              <Th>No. Invoice</Th>
+              <Th>Penghuni</Th>
+              <Th>Kamar</Th>
+              <Th>Jatuh Tempo</Th>
+              <Th className="text-right">Total</Th>
+              <Th>Status</Th>
+            </tr>
+          </thead>
+          <tbody>
+            {d.recent_invoices.map((inv) => (
+              <Tr key={inv.id}>
+                <Td className="font-mono text-xs">{inv.invoice_number}</Td>
+                <Td className="font-medium text-ink">{inv.tenant_name}</Td>
+                <Td className="text-ink-soft">Kamar {inv.room_number}</Td>
+                <Td className="text-ink-soft">{formatTanggal(inv.due_date)}</Td>
+                <Td className="text-right font-medium">{formatRupiah(inv.total_amount)}</Td>
+                <Td><StatusBadge status={inv.status as never} /></Td>
+              </Tr>
+            ))}
+          </tbody>
+        </Table>
+      </Card>
     </>
   );
 }

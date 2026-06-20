@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   MessageSquare,
   Receipt,
+  Settings,
   TrendingUp,
   Users,
   type LucideIcon,
@@ -33,6 +34,7 @@ export const ownerNav: NavItem[] = [
   { label: "Pembayaran", href: "/owner/payments", icon: CreditCard },
   { label: "Laporan", href: "/owner/reports", icon: TrendingUp },
   { label: "Chat", href: "/owner/chat", icon: MessageSquare },
+  { label: "Pengaturan", href: "/owner/settings", icon: Settings },
 ];
 
 // Menu untuk PENGHUNI — lebih sedikit, hanya yang relevan baginya.
@@ -41,4 +43,5 @@ export const tenantNav: NavItem[] = [
   { label: "Tagihan", href: "/tenant/invoices", icon: Receipt },
   { label: "Pembayaran", href: "/tenant/payments", icon: CreditCard },
   { label: "Chat", href: "/tenant/chat", icon: MessageSquare },
+  { label: "Pengaturan", href: "/tenant/settings", icon: Settings },
 ];

@@ -9,17 +9,16 @@ import type { UserRole } from "@/types";
 export default function LoginPage() {
   const { login } = useAuth();
   const [role, setRole] = useState<UserRole>("owner");
-  const [email, setEmail] = useState("owner@kostku.test");
-  const [password, setPassword] = useState("password");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Switch role prefills demo credentials
   function handleRoleSwitch(r: UserRole) {
     setRole(r);
-    setEmail(r === "owner" ? "owner@kostku.test" : "tenant@kostku.test");
-    setPassword("password");
+    setEmail("");
+    setPassword("");
     setError(null);
   }
 
@@ -66,7 +65,7 @@ export default function LoginPage() {
         ))}
       </div>
 
-      <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+      <form onSubmit={handleSubmit} className="mt-6 space-y-4" autoComplete="off">
         <div>
           <label className="mb-1.5 block text-sm font-bold text-ink">
             Email
@@ -78,6 +77,7 @@ export default function LoginPage() {
             onChange={(e) => setEmail(e.target.value)}
             className="nm-input h-11 w-full rounded-xl px-3.5 text-sm text-ink outline-none"
             placeholder="email@contoh.com"
+            autoComplete="off"
           />
         </div>
 
@@ -96,6 +96,7 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               className="nm-input h-11 w-full rounded-xl px-3.5 pr-10 text-sm text-ink outline-none"
               placeholder="••••••••"
+              autoComplete="new-password"
             />
             <button
               type="button"
