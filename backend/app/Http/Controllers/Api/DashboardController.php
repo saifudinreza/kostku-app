@@ -147,8 +147,8 @@ class DashboardController extends Controller
             ->where('status', 'paid')
             ->where('updated_at', '>=', now()->subMonths(5)->startOfMonth())
             ->select(
-                DB::raw('MONTH(updated_at) as month'),
-                DB::raw('YEAR(updated_at) as year'),
+                DB::raw('EXTRACT(MONTH FROM updated_at) as month'),
+                DB::raw('EXTRACT(YEAR FROM updated_at) as year'),
                 DB::raw('SUM(total_amount) as value')
             )
             ->groupBy('year', 'month')
