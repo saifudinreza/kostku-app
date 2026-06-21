@@ -148,7 +148,7 @@ export function OccupancyChart({ occupied, available, maintenance }: OccupancyCh
           )}
         />
         <Tooltip
-          formatter={(value: number, name: string) => [value + " kamar", name]}
+          formatter={(value, name) => [`${value} kamar`, name]}
           contentStyle={{
             borderRadius: 12,
             border: "1px solid #e8e9f3",
