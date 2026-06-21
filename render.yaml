@@ -1,0 +1,87 @@
+services:
+  - type: web
+    name: kostku-backend
+    runtime: docker
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    region: singapore
+    plan: free
+    healthCheckPath: /up
+    envVars:
+      # --- App ---
+      - key: APP_NAME
+        value: KostKu
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_KEY          # isi manual: hasil `php artisan key:generate --show`
+        sync: false
+      - key: APP_URL          # isi manual setelah tau URL render (https://kostku-backend.onrender.com)
+        sync: false
+      - key: FRONTEND_URL     # URL frontend (vercel)
+        sync: false
+      - key: APP_LOCALE
+        value: id
+
+      # --- Database (Neon) ---
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        value: "5432"
+      - key: DB_DATABASE
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_SSLMODE
+        value: require
+
+      # --- Session / cache / queue (single service => sync queue) ---
+      - key: SESSION_DRIVER
+        value: database
+      - key: CACHE_STORE
+        value: database
+      - key: QUEUE_CONNECTION
+        value: sync
+      - key: FILESYSTEM_DISK
+        value: local
+
+      # --- Sanctum (CORS/cookie) ---
+      - key: SANCTUM_STATEFUL_DOMAINS
+        sync: false
+
+      # --- Mail ---
+      - key: MAIL_MAILER
+        value: smtp
+      - key: MAIL_HOST
+        value: smtp.gmail.com
+      - key: MAIL_PORT
+        value: "587"
+      - key: MAIL_USERNAME
+        sync: false
+      - key: MAIL_PASSWORD
+        sync: false
+      - key: MAIL_ENCRYPTION
+        value: tls
+      - key: MAIL_FROM_ADDRESS
+        sync: false
+      - key: MAIL_FROM_NAME
+        value: KostKu
+
+      # --- Integrasi (isi manual) ---
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GROQ_MODEL
+        value: llama-3.3-70b-versatile
+      - key: FONNTE_TOKEN
+        sync: false
+      - key: MIDTRANS_SERVER_KEY
+        sync: false
+      - key: MIDTRANS_CLIENT_KEY
+        sync: false
+      - key: MIDTRANS_IS_PRODUCTION
+        value: "true"
