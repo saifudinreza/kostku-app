@@ -1,5 +1,5 @@
 # ---- Laravel backend image for Render ----
-FROM php:8.3-cli
+FROM php:8.4-cli
 
 # System deps + PHP extensions (match nixpacks.toml: pgsql, gd, intl, zip, dll)
 RUN apt-get update && apt-get install -y --no-install-recommends \
